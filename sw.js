@@ -1,5 +1,5 @@
-const CACHE = "duizend-v6";
-const ASSETS = ["./", "./index.html", "./data.js", "./data-sv.js", "./manifest.json", "./stories.js", "./stories-sv.js", "./icon-180.png", "./icon-512.png"];
+const CACHE = "duizend-v7";
+const ASSETS = ["./", "./index.html", "./data.js", "./data-sv.js", "./data-es.js", "./manifest.json", "./stories.js", "./stories-sv.js", "./stories-es.js", "./icon-180.png", "./icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

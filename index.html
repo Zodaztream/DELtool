@@ -31,8 +31,9 @@ header::after{content:"";display:block;position:absolute;left:0;right:0;bottom:0
 .brand{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
 .brand em{font-style:normal;color:var(--yellow)}
 .tagline{font-size:13px;opacity:.85;margin-top:2px}
-.profiles{display:flex;gap:8px;margin-top:12px}
-.profilebtn{flex:1;background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:9px 8px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.profiles{display:flex;gap:8px;margin-top:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.profiles::-webkit-scrollbar{display:none}
+.profilebtn{flex:0 0 auto;background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .profilebtn.on{background:var(--yellow);color:var(--blue-deep)}
 
 main{padding:20px 20px 40px}
@@ -174,10 +175,7 @@ main{padding:20px 20px 40px}
 <header>
   <div class="brand" id="brandTitle">Dui<em>zend</em></div>
   <div class="tagline" id="brandTagline">Jouw eerste 1000 woorden Nederlands</div>
-  <div class="profiles">
-    <button class="profilebtn" id="tabNL">🇳🇱 Nederlands (jij)</button>
-    <button class="profilebtn" id="tabSV">🇸🇪 Zweeds (hij)</button>
-  </div>
+  <div class="profiles" id="profileTabs"></div>
 </header>
 
 <main>
@@ -192,39 +190,39 @@ main{padding:20px 20px 40px}
       <div class="stat"><b id="stDue">0</b><span>te herhalen</span></div>
       <div class="stat"><b id="stStreak">0</b><span>dagen streak</span></div>
     </div>
-    <button class="startbtn" id="btnStart">Start sessie</button>
+    <button class="startbtn" id="btnStart"></button>
     <div class="subnote" id="sessNote"></div>
     <div class="moderow">
-      <button class="modebtn" id="btnLezen">Lezen<small id="lezenNote"></small></button>
-      <button class="modebtn" id="btnSchrijf">Schrijven<small id="schrijfNote"></small><span class="badge" id="schrijfBadge" style="display:none">tijd!</span></button>
+      <button class="modebtn" id="btnLezen"><span id="lezenLabel"></span><small id="lezenNote"></small></button>
+      <button class="modebtn" id="btnSchrijf"><span id="schrijfLabel"></span><small id="schrijfNote"></small><span class="badge" id="schrijfBadge" style="display:none"></span></button>
     </div>
     <div class="homelinks">
-      <button id="btnSettings">Instellingen</button>
-      <button id="btnExport">Exporteer</button>
-      <button id="btnImport">Importeer</button>
+      <button id="btnSettings"></button>
+      <button id="btnExport"></button>
+      <button id="btnImport"></button>
     </div>
     <input type="file" id="importFile" accept=".json" style="display:none">
     <div class="settings" id="settingsPanel">
       <div class="setrow">
-        <label>Nieuwe woorden per dag</label>
+        <label id="lblNewPerDay"></label>
         <div class="seg" id="segNew">
           <button data-v="5">5</button><button data-v="8">8</button><button data-v="15">15</button><button data-v="20">20</button>
         </div>
       </div>
       <div class="setrow">
-        <label>Oefenvorm</label>
+        <label id="lblMode"></label>
         <div class="seg" id="segMode">
-          <button data-v="auto">Mix</button><button data-v="flash">Kaarten</button><button data-v="type">Typen</button>
+          <button data-v="auto" id="modeAuto"></button><button data-v="flash" id="modeFlash"></button><button data-v="type" id="modeType"></button>
         </div>
       </div>
       <div class="setrow">
-        <label style="width:100%">Anthropic API-sleutel (optioneel, voor AI-controle bij Schrijven)</label>
+        <label style="width:100%" id="lblApiKey"></label>
         <input type="password" class="keyinput" id="apiKeyIn" placeholder="sk-ant-…">
-        <span class="sethint">De sleutel blijft alleen op dit apparaat. Zonder sleutel kun je bij Schrijven een controle-prompt kopiëren en in een AI-app plakken.</span>
+        <span class="sethint" id="apiKeyHint"></span>
       </div>
       <div class="setrow">
-        <label>Alles resetten</label>
-        <div class="seg"><button id="btnReset" style="color:var(--err)">Reset</button></div>
+        <label id="lblResetAll"></label>
+        <div class="seg"><button id="btnReset" style="color:var(--err)"></button></div>
       </div>
     </div>
   </section>
@@ -232,7 +230,7 @@ main{padding:20px 20px 40px}
   <!-- SESSION -->
   <section class="screen" id="scr-sess">
     <div class="sess-top">
-      <button id="btnQuit">✕ Stop</button>
+      <button id="btnQuit"></button>
       <div class="prog"><i id="progBar"></i></div>
       <span id="progTxt" style="font-size:13px;color:var(--muted);font-variant:tabular-nums"></span>
     </div>
@@ -243,50 +241,50 @@ main{padding:20px 20px 40px}
   <section class="screen" id="scr-done">
     <div class="done-wrap">
       <svg viewBox="0 0 50 40"><path class="body" d="M25 2 L38 12 L38 16 L42 16 L42 40 L8 40 L8 16 L12 16 L12 12 Z"/><rect class="win" x="20" y="18" width="10" height="8" rx="1"/><rect class="win" x="20" y="30" width="10" height="10" rx="1"/></svg>
-      <h2>Goed gedaan!</h2>
+      <h2 id="doneTitle"></h2>
       <p id="doneStats"></p>
-      <button class="startbtn" id="btnHome">Terug naar start</button>
+      <button class="startbtn" id="btnHome"></button>
     </div>
   </section>
 
   <!-- LEZEN LIST -->
   <section class="screen" id="scr-lezen">
-    <div class="backrow"><button class="backbtn">← Terug</button></div>
+    <div class="backrow"><button class="backbtn"></button></div>
     <div class="story-list" id="storyList"></div>
-    <p class="readhint">Nieuwe verhalen ontgrendel je door woorden te leren.</p>
+    <p class="readhint" id="readHintLezen"></p>
   </section>
 
   <!-- READER -->
   <section class="screen" id="scr-reader">
-    <div class="backrow"><button id="btnReaderBack">← Verhalen</button></div>
+    <div class="backrow"><button id="btnReaderBack"></button></div>
     <div class="reader">
       <h2 id="rTitle"></h2>
       <div class="rtools">
-        <button id="rPlay">🔊 Luister</button>
-        <button id="rPlaySlow">🐢 Langzaam</button>
-        <button id="rStop">◼︎ Stop</button>
+        <button id="rPlay"></button>
+        <button id="rPlaySlow"></button>
+        <button id="rStop"></button>
       </div>
       <div class="rtxt" id="rTxt"></div>
       <div class="glossbar" id="glossBar"></div>
-      <p class="readhint">Tik op een woord voor de betekenis.</p>
+      <p class="readhint" id="readHintReader"></p>
     </div>
   </section>
 
   <!-- SCHRIJVEN -->
   <section class="screen" id="scr-schrijf">
-    <div class="backrow"><button class="backbtn">← Terug</button></div>
+    <div class="backrow"><button class="backbtn"></button></div>
     <div class="schrijf">
-      <h2>Schrijfsessie</h2>
-      <p class="intro">Schrijf een klein verhaaltje of dagboekje en gebruik alle woorden hieronder. Zelf zinnen maken is de sterkste vorm van onthouden.</p>
+      <h2 id="schrijfTitle"></h2>
+      <p class="intro" id="schrijfIntro"></p>
       <div class="targets" id="targets"></div>
-      <textarea id="schrijfTxt" placeholder="Vandaag …" autocorrect="off" autocapitalize="sentences"></textarea>
+      <textarea id="schrijfTxt" autocorrect="off" autocapitalize="sentences"></textarea>
       <div class="btnrow">
-        <button class="b-good" id="btnSaveEntry">Opslaan</button>
-        <button class="b-easy" id="btnAiCheck">AI-controle</button>
+        <button class="b-good" id="btnSaveEntry"></button>
+        <button class="b-easy" id="btnAiCheck"></button>
       </div>
       <div class="btnrow" style="margin-top:8px">
-        <button style="background:#EEF2FA;color:var(--blue)" id="btnCopyPrompt">Kopieer controle-prompt</button>
-        <button style="background:#EEF2FA;color:var(--blue)" id="btnNewTargets">Andere woorden</button>
+        <button style="background:#EEF2FA;color:var(--blue)" id="btnCopyPrompt"></button>
+        <button style="background:#EEF2FA;color:var(--blue)" id="btnNewTargets"></button>
       </div>
       <div class="airesult" id="aiResult"></div>
     </div>
@@ -298,24 +296,190 @@ main{padding:20px 20px 40px}
 
 <script src="./data.js"></script>
 <script src="./data-sv.js"></script>
+<script src="./data-es.js"></script>
 <script src="./stories.js"></script>
 <script src="./stories-sv.js"></script>
+<script src="./stories-es.js"></script>
 <script>
 "use strict";
+/* ================= i18n ================= */
+const UI_STRINGS={
+  nl:{
+    lezenLabel:"Lezen",schrijfLabel:"Schrijven",schrijfBadgeText:"tijd!",
+    settingsBtn:"Instellingen",exportBtn:"Exporteer",importBtn:"Importeer",
+    newPerDayLabel:"Nieuwe woorden per dag",modeLabel:"Oefenvorm",
+    modeMix:"Mix",modeCards:"Kaarten",modeType:"Typen",
+    apiKeyLabel:"Anthropic API-sleutel (optioneel, voor AI-controle bij Schrijven)",
+    apiKeyHint:"De sleutel blijft alleen op dit apparaat. Zonder sleutel kun je bij Schrijven een controle-prompt kopiëren en in een AI-app plakken.",
+    resetLabel:"Alles resetten",resetBtn:"Reset",
+    startBtn:"Start sessie",stLearnedLabel:"gestart",stDueLabel:"te herhalen",stStreakLabel:"dagen streak",
+    quitBtn:"✕ Stop",doneTitle:"Goed gedaan!",homeBtn:"Terug naar start",
+    backBtn:"← Terug",readerBackBtn:"← Verhalen",
+    playBtn:"🔊 Luister",playSlowBtn:"🐢 Langzaam",stopBtn:"◼︎ Stop",
+    readHintLezen:"Nieuwe verhalen ontgrendel je door woorden te leren.",
+    readHintReader:"Tik op een woord voor de betekenis.",
+    schrijfTitle:"Schrijfsessie",
+    schrijfIntro:"Schrijf een klein verhaaltje of dagboekje en gebruik alle woorden hieronder. Zelf zinnen maken is de sterkste vorm van onthouden.",
+    schrijfPlaceholder:"Vandaag …",
+    saveEntryBtn:"Opslaan",aiCheckBtn:"AI-controle",copyPromptBtn:"Kopieer controle-prompt",newTargetsBtn:"Andere woorden",
+    journalTitle:"Jouw dagboek",targetWordsLabel:"doelwoorden",
+    lockMsg:"Leer eerst ±15 woorden, dan kun je gaan schrijven.",
+    newWordLabel:"Nieuw woord",reviewLabel:"Herhaling",
+    shadowTip:"🗣 Zeg de zin hardop na — dat traint je uitspraak.",shadowAgainBtn:"🐢 Nog eens",
+    revealBtn:"Laat zien",againBtn:"Opnieuw",goodBtn:"Goed",easyBtn:"Makkelijk",
+    checkBtn:"Controleer",nextBtn:"Volgende",gotItBtn:"Ik had het",continueBtn:"Verder",
+    allDoneNote:"Alles klaar voor vandaag — tot morgen! 🌷",
+    dueLabel:"te herhalen",newLabel:"nieuw",newLabelPlural:"nieuwe",minLabel:"min",
+    storiesLabel:"verhalen",writeOwnSentencesLabel:"zelf zinnen maken",entriesLabel:"stukjes",
+    cardsCompletedLabel:"kaarten afgerond",ofTheLabel:"van de",wordsStartedLabel:"woorden gestart",
+    unlockAtTemplate:(m,n)=>"Ontgrendel bij "+m+" gestarte woorden ("+n+"/"+m+")",
+    wordsCountTemplate:(n)=>"~"+n+" woorden",
+    notInVocabList:"nog niet in je woordenlijst",
+    savingFailed:"Opslaan mislukt",minTenWords:"Schrijf minstens 10 woorden",
+    savedWordsUsed:(u,t)=>"Opgeslagen — "+u+"/"+t+" woorden gebruikt ✓",
+    writeSomethingFirst:"Schrijf eerst iets",newWordsChosen:"Nieuwe woorden gekozen",
+    keySaved:"Sleutel opgeslagen op dit apparaat",checkingInProgress:"Bezig met controleren…",
+    noKeySet:"Geen API-sleutel ingesteld. Voeg er één toe bij Instellingen, of gebruik 'Kopieer controle-prompt' en plak die in een AI-app.",
+    noAnswerReceived:"Geen antwoord ontvangen.",
+    checkFailedTemplate:(m)=>"Controle mislukt ("+m+"). Controleer je sleutel en internetverbinding, of gebruik de kopieer-knop.",
+    copiedPasteInAI:"Gekopieerd — plak in een AI-app",copyNotAvailable:"Kopiëren niet beschikbaar",copyFailed:"Kopiëren mislukt",
+    invalidFile:"Ongeldig bestand",progressImported:"Voortgang geïmporteerd ✓",resetDone:"Gereset",
+    resetConfirmTemplate:(tag)=>"Alle voortgang van dit profiel ("+tag+") wissen? Het andere profiel blijft ongewijzigd. Dit kan niet ongedaan worden gemaakt.",
+    wrongProfileFileTemplate:(other,self)=>"Dit bestand is van "+other+", niet "+self+". Wissel eerst van tabblad.",
+    noAudio:"Geen audio beschikbaar",
+    doneStatsTemplate:(done,started,total)=>done+" "+"kaarten afgerond"+" · "+started+" "+"van de"+" "+total+" "+"woorden gestart",
+    goodFeedback:"Goed! ✓",closeFeedbackPrefix:"Bijna! Het juiste antwoord:",wrongFeedbackPrefix:"Het juiste antwoord:",
+  },
+  en:{
+    lezenLabel:"Read",schrijfLabel:"Write",schrijfBadgeText:"time!",
+    settingsBtn:"Settings",exportBtn:"Export",importBtn:"Import",
+    newPerDayLabel:"New words per day",modeLabel:"Practice mode",
+    modeMix:"Mix",modeCards:"Cards",modeType:"Type",
+    apiKeyLabel:"Anthropic API key (optional, for AI-check in Write)",
+    apiKeyHint:"The key stays on this device only. Without a key, use 'Copy check-prompt' in Write and paste it into any AI app.",
+    resetLabel:"Reset everything",resetBtn:"Reset",
+    startBtn:"Start session",stLearnedLabel:"started",stDueLabel:"to review",stStreakLabel:"day streak",
+    quitBtn:"✕ Stop",doneTitle:"Well done!",homeBtn:"Back to home",
+    backBtn:"← Back",readerBackBtn:"← Stories",
+    playBtn:"🔊 Listen",playSlowBtn:"🐢 Slow",stopBtn:"◼︎ Stop",
+    readHintLezen:"Unlock new stories by learning words.",
+    readHintReader:"Tap a word for its meaning.",
+    schrijfTitle:"Writing session",
+    schrijfIntro:"Write a short story or diary entry using all the words below. Composing your own sentences is the strongest form of retention.",
+    schrijfPlaceholder:"Today …",
+    saveEntryBtn:"Save",aiCheckBtn:"AI check",copyPromptBtn:"Copy check-prompt",newTargetsBtn:"Other words",
+    journalTitle:"Your journal",targetWordsLabel:"target words",
+    lockMsg:"Learn about 15 words first, then you can start writing.",
+    newWordLabel:"New word",reviewLabel:"Review",
+    shadowTip:"🗣 Say the sentence out loud — that trains your pronunciation.",shadowAgainBtn:"🐢 Again",
+    revealBtn:"Show answer",againBtn:"Again",goodBtn:"Good",easyBtn:"Easy",
+    checkBtn:"Check",nextBtn:"Next",gotItBtn:"I had it",continueBtn:"Continue",
+    allDoneNote:"All done for today — see you tomorrow! 🌷",
+    dueLabel:"to review",newLabel:"new",newLabelPlural:"new",minLabel:"min",
+    storiesLabel:"stories",writeOwnSentencesLabel:"write your own sentences",entriesLabel:"entries",
+    cardsCompletedLabel:"cards completed",ofTheLabel:"of",wordsStartedLabel:"words started",
+    unlockAtTemplate:(m,n)=>"Unlocks at "+m+" words started ("+n+"/"+m+")",
+    wordsCountTemplate:(n)=>"~"+n+" words",
+    notInVocabList:"not in your word list yet",
+    savingFailed:"Save failed",minTenWords:"Write at least 10 words",
+    savedWordsUsed:(u,t)=>"Saved — "+u+"/"+t+" words used ✓",
+    writeSomethingFirst:"Write something first",newWordsChosen:"New words picked",
+    keySaved:"Key saved on this device",checkingInProgress:"Checking…",
+    noKeySet:"No API key set. Add one in Settings, or use 'Copy check-prompt' and paste it into any AI app.",
+    noAnswerReceived:"No answer received.",
+    checkFailedTemplate:(m)=>"Check failed ("+m+"). Check your key and internet connection, or use the copy button.",
+    copiedPasteInAI:"Copied — paste into any AI app",copyNotAvailable:"Copying not available",copyFailed:"Copy failed",
+    invalidFile:"Invalid file",progressImported:"Progress imported ✓",resetDone:"Reset",
+    resetConfirmTemplate:(tag)=>"Erase all progress for this profile ("+tag+")? The other profile is unaffected. This cannot be undone.",
+    wrongProfileFileTemplate:(other,self)=>"This file is from "+other+", not "+self+". Switch tabs first.",
+    noAudio:"Audio unavailable",
+    doneStatsTemplate:(done,started,total)=>done+" cards completed · "+started+" of "+total+" words started",
+    goodFeedback:"Correct! ✓",closeFeedbackPrefix:"Almost! The correct answer:",wrongFeedbackPrefix:"The correct answer:",
+  }
+};
+function T(){return UI_STRINGS[PROFILE.uiLocale]}
+
 /* ================= profiles ================= */
+// simplified dalahäst (Dala horse) silhouette
+const DALA=["M6 34 L6 24 C6 17 11 12 17 11 L16 9 C15 7 16 5 18 5 L23 5 C25 5 26 7 25 9 L24 12 L30 12 C35 12 38 16 38 20 L40 20 L40 26 L38 26 L38 20 C38 20 37 24 33 25 L33 34 L27 34 L27 27 L17 27 L17 34 Z"];
+const GABLES=[
+  "M25 2 L40 14 L40 40 L10 40 L10 14 Z",
+  "M10 40 L10 16 L15 16 L15 10 L20 10 L20 5 L30 5 L30 10 L35 10 L35 16 L40 16 L40 40 Z",
+  "M10 40 L10 18 C10 8 18 4 25 4 C32 4 40 8 40 18 L40 40 Z",
+  "M10 40 L10 14 L18 14 L18 6 L32 6 L32 14 L40 14 L40 40 Z"
+];
+// stylized flamenco guitar body silhouette
+const GUITAR=["M25 3 C32 3 36 8 35 13 C34 17 32 17 33 21 C34 25 37 29 35 33 C33 37 29 38 25 38 C21 38 17 37 15 33 C13 29 16 25 17 21 C18 17 16 17 15 13 C14 8 18 3 25 3 Z"];
 const PROFILES={
   nl:{id:"nl",storageKey:"duizend_v1",brandHtml:"Dui<em>zend</em>",tagline:"Jouw eerste 1000 woorden Nederlands",
-      flag:"🇳🇱",nativeFlag:"🇸🇪",cognateLabel:"≈ Zweeds",ttsLang:"nl-NL",words:WORDS_NL,stories:STORIES_NL,
-      teacherLabel:"Dutch",typeLabel:"Typ het in het Nederlands"},
+      tabLabel:"🇳🇱 Nederlands",flag:"🇳🇱",nativeFlag:"🇸🇪",cognateLabel:"≈ Zweeds",ttsLang:"nl-NL",
+      words:WORDS_NL,stories:STORIES_NL,teacherLabel:"Dutch",typeLabel:"Typ het in het Nederlands",
+      typePlaceholder:"Typ de Nederlandse zin…",uiLocale:"nl",icons:GABLES,streakLabel:"Deze week aan de gracht",
+      showNativeLine:true},
   sv:{id:"sv",storageKey:"duizend_v1_sv",brandHtml:"Tu<em>sen</em>",tagline:"Je eerste 1000 woorden Zweeds",
-      flag:"🇸🇪",nativeFlag:"🇳🇱",cognateLabel:"≈ Nederlands",ttsLang:"sv-SE",words:WORDS_SV,stories:STORIES_SV,
-      teacherLabel:"Swedish",typeLabel:"Typ het in het Zweeds"}
+      tabLabel:"🇸🇪 Zweeds",flag:"🇸🇪",nativeFlag:"🇳🇱",cognateLabel:"≈ Nederlands",ttsLang:"sv-SE",
+      words:WORDS_SV,stories:STORIES_SV,teacherLabel:"Swedish",typeLabel:"Typ het in het Zweeds",
+      typePlaceholder:"Typ de Zweedse zin…",uiLocale:"nl",icons:DALA,streakLabel:"Deze week bij de dalahäst",
+      showNativeLine:true},
+  es:{id:"es",storageKey:"duizend_v1_es",brandHtml:"M<em>il</em>",tagline:"Your first 1000 Spanish words",
+      tabLabel:"🇪🇸 Español",flag:"🇪🇸",nativeFlag:"🇬🇧",cognateLabel:"≈ English",ttsLang:"es-ES",
+      words:(typeof WORDS_ES!=="undefined"?WORDS_ES:[]),stories:(typeof STORIES_ES!=="undefined"?STORIES_ES:[]),
+      teacherLabel:"Spanish",typeLabel:"Type it in Spanish",
+      typePlaceholder:"Type the Spanish sentence…",uiLocale:"en",icons:GUITAR,streakLabel:"This week with the guitar",
+      showNativeLine:false}
 };
+const PROFILE_ORDER=["nl","sv","es"];
 var activeId=localStorage.getItem("duizend_active_profile")||"nl";
+if(!PROFILES[activeId])activeId="nl";
 var PROFILE,WORDS,STORIES,byId,S;
 const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:""},newLog:{date:"",count:0},journal:[],lastSchrijf:0};
 function loadState(key){try{const raw=localStorage.getItem(key);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
-function save(){try{localStorage.setItem(PROFILE.storageKey,JSON.stringify(S))}catch(e){toast("Opslaan mislukt")}}
+function save(){try{localStorage.setItem(PROFILE.storageKey,JSON.stringify(S))}catch(e){toast(T().savingFailed)}}
+function renderTabs(){
+  const row=document.getElementById("profileTabs");row.innerHTML="";
+  PROFILE_ORDER.forEach(id=>{
+    const b=document.createElement("button");
+    b.className="profilebtn"+(id===activeId?" on":"");
+    b.textContent=PROFILES[id].tabLabel;
+    b.onclick=()=>{if(activeId!==id)setProfile(id)};
+    row.appendChild(b);
+  });
+}
+function applyUiStrings(){
+  const t=T();
+  document.getElementById("lezenLabel").textContent=t.lezenLabel;
+  document.getElementById("schrijfLabel").textContent=t.schrijfLabel;
+  document.getElementById("schrijfBadge").textContent=t.schrijfBadgeText;
+  document.getElementById("btnSettings").textContent=t.settingsBtn;
+  document.getElementById("btnExport").textContent=t.exportBtn;
+  document.getElementById("btnImport").textContent=t.importBtn;
+  document.getElementById("lblNewPerDay").textContent=t.newPerDayLabel;
+  document.getElementById("lblMode").textContent=t.modeLabel;
+  document.getElementById("modeAuto").textContent=t.modeMix;
+  document.getElementById("modeFlash").textContent=t.modeCards;
+  document.getElementById("modeType").textContent=t.modeType;
+  document.getElementById("lblApiKey").textContent=t.apiKeyLabel;
+  document.getElementById("apiKeyHint").textContent=t.apiKeyHint;
+  document.getElementById("lblResetAll").textContent=t.resetLabel;
+  document.getElementById("btnReset").textContent=t.resetBtn;
+  document.getElementById("btnQuit").textContent=t.quitBtn;
+  document.getElementById("doneTitle").textContent=t.doneTitle;
+  document.getElementById("btnHome").textContent=t.homeBtn;
+  document.querySelectorAll(".backbtn").forEach(b=>b.textContent=t.backBtn);
+  document.getElementById("btnReaderBack").textContent=t.readerBackBtn;
+  document.getElementById("rPlay").textContent=t.playBtn;
+  document.getElementById("rPlaySlow").textContent=t.playSlowBtn;
+  document.getElementById("rStop").textContent=t.stopBtn;
+  document.getElementById("readHintLezen").textContent=t.readHintLezen;
+  document.getElementById("readHintReader").textContent=t.readHintReader;
+  document.getElementById("schrijfTitle").textContent=t.schrijfTitle;
+  document.getElementById("schrijfIntro").textContent=t.schrijfIntro;
+  document.getElementById("schrijfTxt").placeholder=PROFILE.typePlaceholder&&PROFILE.id?t.schrijfPlaceholder:t.schrijfPlaceholder;
+  document.getElementById("btnSaveEntry").textContent=t.saveEntryBtn;
+  document.getElementById("btnAiCheck").textContent=t.aiCheckBtn;
+  document.getElementById("btnCopyPrompt").textContent=t.copyPromptBtn;
+  document.getElementById("btnNewTargets").textContent=t.newTargetsBtn;
+}
 function setProfile(id){
   if(PROFILE&&reviewedOk>0){S.days[today()]=true;save();reviewedOk=0}
   activeId=id;localStorage.setItem("duizend_active_profile",id);
@@ -325,9 +489,9 @@ function setProfile(id){
   nlVoice=null;pickVoice();
   document.getElementById("brandTitle").innerHTML=PROFILE.brandHtml;
   document.getElementById("brandTagline").textContent=PROFILE.tagline;
-  document.getElementById("tabNL").classList.toggle("on",id==="nl");
-  document.getElementById("tabSV").classList.toggle("on",id==="sv");
-  document.title=(id==="nl"?"Duizend":"Tusen")+" — leer "+(id==="nl"?"Nederlands":"Zweeds");
+  renderTabs();
+  applyUiStrings();
+  document.title=PROFILE.brandHtml.replace(/<[^>]+>/g,"")+" — "+PROFILE.tagline;
   show("scr-home");
 }
 function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
@@ -387,7 +551,7 @@ let nlVoice=null;
 function pickVoice(){const vs=speechSynthesis.getVoices();nlVoice=vs.find(v=>v.lang===PROFILE.ttsLang)||vs.find(v=>v.lang&&v.lang.startsWith(PROFILE.ttsLang.slice(0,2)))||null}
 if("speechSynthesis" in window){speechSynthesis.onvoiceschanged=pickVoice}
 function speak(txt,rate){
-  if(!("speechSynthesis" in window))return toast("Geen audio beschikbaar");
+  if(!("speechSynthesis" in window))return toast(T().noAudio);
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(txt);
   u.lang=PROFILE.ttsLang;if(nlVoice)u.voice=nlVoice;u.rate=rate||0.92;
@@ -406,9 +570,9 @@ function lev(a,b){
   return prev[n];
 }
 function similarity(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;const d=lev(a,b);return 1-d/Math.max(a.length,b.length)}
-function stripArticle(w){return norm(w).replace(/^(de|het|een|en|ett)\s+/,"")}
+function stripArticle(w){return norm(w).replace(/^(de|het|een|en|ett|el|la|los|las)\s+/,"")}
 function hintFor(target){
-  const FILLERS=new Set(["att","de","het","een"]);
+  const FILLERS=new Set(["att","de","het","een","el","la","los","las"]);
   const words=target.split(" ").filter(Boolean);
   let idx=0;
   while(idx<words.length-1&&FILLERS.has(words[idx].toLowerCase()))idx++;
@@ -450,26 +614,29 @@ function renderCard(){
   const id=queue[pos],w=byId[id],mode=currentModeFor(id);
   const K=document.getElementById("kaart");
   const isNew=!S.cards[id];
+  const t=T();
   const cog=w.c?`<span class="cognate-tag">${PROFILE.cognateLabel}</span>`:"";
+  const nativeLine=PROFILE.showNativeLine?`<p class="sv">${PROFILE.nativeFlag} <b>${w.v}</b></p>`:"";
+  const nativeParen=PROFILE.showNativeLine?` — ${PROFILE.nativeFlag} ${w.v}`:"";
   if(mode==="flash"){
     K.innerHTML=`
-      <div class="mode-tag"><span>${isNew?"Nieuw woord":"Herhaling"}</span>${cog}</div>
+      <div class="mode-tag"><span>${isNew?t.newWordLabel:t.reviewLabel}</span>${cog}</div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
         <div><h2>${w.w}</h2><p class="zin">${w.s}</p></div>
-        <button class="speak" aria-label="Luister">🔊</button>
+        <button class="speak" aria-label="${t.playBtn}">🔊</button>
       </div>
       <div class="answer" id="ans">
         <p class="gloss">${w.e}</p>
-        <p class="sv">${PROFILE.nativeFlag} <b>${w.v}</b></p>
+        ${nativeLine}
         <p class="xen">${w.x}</p>
-        <div class="shadow-tip">🗣 Zeg de zin hardop na — dat traint je uitspraak.<button id="shadowBtn">🐢 Nog eens</button></div>
+        <div class="shadow-tip">${t.shadowTip}<button id="shadowBtn">${t.shadowAgainBtn}</button></div>
       </div>
       <div class="spacer"></div>
-      <div class="btnrow" id="row1"><button class="b-reveal">Laat zien</button></div>
+      <div class="btnrow" id="row1"><button class="b-reveal">${t.revealBtn}</button></div>
       <div class="btnrow" id="row2" style="display:none">
-        <button class="b-again">Opnieuw</button>
-        <button class="b-good">Goed</button>
-        <button class="b-easy">Makkelijk</button>
+        <button class="b-again">${t.againBtn}</button>
+        <button class="b-good">${t.goodBtn}</button>
+        <button class="b-easy">${t.easyBtn}</button>
       </div>`;
     K.querySelector(".speak").onclick=()=>speak(w.s);
     K.querySelector(".b-reveal").onclick=()=>{
@@ -488,14 +655,14 @@ function renderCard(){
       <p class="prompt-en">“${w.x}”</p>
       <p class="zin" style="color:var(--muted);font-size:14px">hint: ${w.e} → <b>${hintFor(w.w)}</b></p>
       <div class="typebox">
-        <input type="text" id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Typ de Nederlandse zin…">
+        <input type="text" id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${PROFILE.typePlaceholder}">
       </div>
       <div class="feedback" id="fb"></div>
       <div class="spacer"></div>
-      <div class="btnrow" id="rowCheck"><button class="b-check">Controleer</button></div>
+      <div class="btnrow" id="rowCheck"><button class="b-check">${t.checkBtn}</button></div>
       <div class="btnrow" id="rowNext" style="display:none">
-        <button class="b-again" id="fbAgain" style="display:none">Opnieuw</button>
-        <button class="b-good" id="fbNext">Volgende</button>
+        <button class="b-again" id="fbAgain" style="display:none">${t.againBtn}</button>
+        <button class="b-good" id="fbNext">${t.nextBtn}</button>
       </div>`;
     const inp=K.querySelector("#typeIn");
     setTimeout(()=>inp.focus(),50);
@@ -507,19 +674,19 @@ function renderCard(){
       speak(w.s);
       if(sim>=0.82){
         fb.className="feedback show ok";
-        fb.innerHTML=`Goed! ✓<span class="correct-zin">${w.s}</span>`;
+        fb.innerHTML=`${t.goodFeedback}<span class="correct-zin">${w.s}</span>`;
         document.getElementById("fbNext").onclick=()=>grade(id,sim>=0.97?"easy":"good");
       }else if(sim>=0.55){
         fb.className="feedback show close";
-        fb.innerHTML=`Bijna! Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — ${PROFILE.nativeFlag} ${w.v})</span>`;
+        fb.innerHTML=`${t.closeFeedbackPrefix}<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e}${nativeParen})</span>`;
         document.getElementById("fbAgain").style.display="block";
-        document.getElementById("fbNext").textContent="Ik had het";
+        document.getElementById("fbNext").textContent=t.gotItBtn;
         document.getElementById("fbAgain").onclick=()=>grade(id,"again");
         document.getElementById("fbNext").onclick=()=>grade(id,"good");
       }else{
         fb.className="feedback show no";
-        fb.innerHTML=`Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — ${PROFILE.nativeFlag} ${w.v})</span>`;
-        document.getElementById("fbNext").textContent="Verder";
+        fb.innerHTML=`${t.wrongFeedbackPrefix}<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e}${nativeParen})</span>`;
+        document.getElementById("fbNext").textContent=t.continueBtn;
         document.getElementById("fbNext").onclick=()=>grade(id,"again");
       }
     };
@@ -545,20 +712,20 @@ function grade(id,g){
 }
 function finishSession(){
   if(reviewedOk>0){S.days[today()]=true;save()}
-  document.getElementById("doneStats").textContent=
-    `${reviewedOk} kaarten afgerond · ${Object.keys(S.cards).length} van de ${WORDS.length} woorden gestart`;
+  document.getElementById("doneStats").textContent=T().doneStatsTemplate(reviewedOk,Object.keys(S.cards).length,WORDS.length);
   show("scr-done");
 }
 
 /* ================= Lezen ================= */
 function renderLezen(){
   const n=Object.keys(S.cards).length;
+  const t=T();
   const list=document.getElementById("storyList");list.innerHTML="";
   STORIES.forEach((st,idx)=>{
     const open=n>=st.m;
     const b=document.createElement("button");
     b.className="story-item"+(open?"":" locked");
-    b.innerHTML=`<div><h3>${st.t}</h3><span>${open?"~"+st.txt.split(" ").length+" woorden":"Ontgrendel bij "+st.m+" gestarte woorden ("+n+"/"+st.m+")"}</span></div><span class="lock">${open?"→":"🔒"}</span>`;
+    b.innerHTML=`<div><h3>${st.t}</h3><span>${open?t.wordsCountTemplate(st.txt.split(" ").length):t.unlockAtTemplate(st.m,n)}</span></div><span class="lock">${open?"→":"🔒"}</span>`;
     if(open)b.onclick=()=>openReader(idx);
     list.appendChild(b);
   });
@@ -587,9 +754,9 @@ function showGloss(tok){
       ||WORDS.find(w=>altForms(w.w).some(a=>a.split(" ").includes(t)))
       ||WORDS.find(w=>altForms(w.w).some(a=>a.length>=4&&t.startsWith(a)&&t.length-a.length<=3)) // tapped word is inflection of entry (woorden -> woord)
       ||WORDS.find(w=>altForms(w.w).some(a=>t.length>=4&&a.startsWith(t)&&a.length-t.length<=3));  // entry is longer form of tapped word
-    if(hit)g=hit.e+" · "+PROFILE.nativeFlag+" "+hit.v;
+    if(hit)g=PROFILE.showNativeLine?hit.e+" · "+PROFILE.nativeFlag+" "+hit.v:hit.e;
   }
-  bar.innerHTML=g?`<b>${tok.replace(/[.,!?]/g,"")}</b> — ${g}`:`<b>${tok.replace(/[.,!?]/g,"")}</b> — nog niet in je woordenlijst`;
+  bar.innerHTML=g?`<b>${tok.replace(/[.,!?]/g,"")}</b> — ${g}`:`<b>${tok.replace(/[.,!?]/g,"")}</b> — ${T().notInVocabList}`;
   bar.classList.add("show");
   speak(tok.replace(/[.,!?]/g,""));
 }
@@ -610,7 +777,7 @@ function renderSchrijf(keepText){
   const grads=graduatedIds();
   const box=document.getElementById("targets");
   if(grads.length<15){
-    box.innerHTML='<span class="target">Leer eerst ±15 woorden, dan kun je gaan schrijven.</span>';
+    box.innerHTML=`<span class="target">${T().lockMsg}</span>`;
     document.getElementById("schrijfTxt").disabled=true;
   }else{
     document.getElementById("schrijfTxt").disabled=false;
@@ -634,8 +801,9 @@ function updateTargets(){
   });
 }
 function saveEntry(){
+  const t=T();
   const text=document.getElementById("schrijfTxt").value.trim();
-  if(text.split(/\s+/).length<10)return toast("Schrijf minstens 10 woorden");
+  if(text.split(/\s+/).length<10)return toast(t.minTenWords);
   const used=targetIds.filter(id=>textUsesWord(text,byId[id].w));
   used.forEach(id=>{const c=S.cards[id];if(c&&c.iv>=1){schedule(c,"good",!!byId[id].c)}});
   S.journal.unshift({d:today(),text,words:targetIds.map(id=>byId[id].w),used:used.length});
@@ -643,19 +811,20 @@ function saveEntry(){
   S.lastSchrijf=Date.now();
   S.days[today()]=true;
   save();
-  toast(`Opgeslagen — ${used.length}/${targetIds.length} woorden gebruikt ✓`);
+  toast(t.savedWordsUsed(used.length,targetIds.length));
   targetIds=[];renderSchrijf();
 }
 function buildAiPrompt(){
-  return `You are a friendly ${PROFILE.teacherLabel} teacher. A learner living in Amsterdam (native speaker of the other partner's language) wrote this short ${PROFILE.teacherLabel} text. 1) Give a corrected version. 2) List the 2-4 most important corrections with a one-line explanation each (in English). 3) End with one short encouragement in ${PROFILE.teacherLabel}. Keep it concise. Text:\n\n`;
+  return `You are a friendly ${PROFILE.teacherLabel} teacher. A learner wrote this short ${PROFILE.teacherLabel} text. 1) Give a corrected version. 2) List the 2-4 most important corrections with a one-line explanation each (in English). 3) End with one short encouragement in ${PROFILE.teacherLabel}. Keep it concise. Text:\n\n`;
 }
 async function aiCheck(){
+  const t=T();
   const text=document.getElementById("schrijfTxt").value.trim();
-  if(!text)return toast("Schrijf eerst iets");
+  if(!text)return toast(t.writeSomethingFirst);
   const key=(S.settings.apiKey||"").trim();
   const out=document.getElementById("aiResult");
-  if(!key){out.textContent="Geen API-sleutel ingesteld. Voeg er één toe bij Instellingen, of gebruik 'Kopieer controle-prompt' en plak die in een AI-app.";out.classList.add("show");return}
-  out.textContent="Bezig met controleren…";out.classList.add("show");
+  if(!key){out.textContent=t.noKeySet;out.classList.add("show");return}
+  out.textContent=t.checkingInProgress;out.classList.add("show");
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
@@ -664,42 +833,36 @@ async function aiCheck(){
     });
     if(!res.ok)throw new Error("API "+res.status);
     const data=await res.json();
-    out.textContent=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n")||"Geen antwoord ontvangen.";
+    out.textContent=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n")||t.noAnswerReceived;
   }catch(e){
-    out.textContent="Controle mislukt ("+e.message+"). Controleer je sleutel en internetverbinding, of gebruik de kopieer-knop.";
+    out.textContent=t.checkFailedTemplate(e.message);
   }
 }
 function copyPrompt(){
+  const t=T();
   const text=document.getElementById("schrijfTxt").value.trim();
-  if(!text)return toast("Schrijf eerst iets");
+  if(!text)return toast(t.writeSomethingFirst);
   const full=buildAiPrompt()+text;
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(full).then(()=>toast("Gekopieerd — plak in een AI-app")).catch(()=>toast("Kopiëren mislukt"));
-  }else toast("Kopiëren niet beschikbaar");
+    navigator.clipboard.writeText(full).then(()=>toast(t.copiedPasteInAI)).catch(()=>toast(t.copyFailed));
+  }else toast(t.copyNotAvailable);
 }
 function renderJournal(){
+  const t=T();
   const j=document.getElementById("journal");
   if(!S.journal.length){j.innerHTML="";return}
-  j.innerHTML="<h3>Jouw dagboek</h3>"+S.journal.map(e=>
-    `<div class="jentry"><div class="jdate">${e.d} · ${e.used}/${e.words.length} doelwoorden</div>${e.text.replace(/</g,"&lt;")}</div>`).join("");
+  j.innerHTML=`<h3>${t.journalTitle}</h3>`+S.journal.map(e=>
+    `<div class="jentry"><div class="jdate">${e.d} · ${e.used}/${e.words.length} ${t.targetWordsLabel}</div>${e.text.replace(/</g,"&lt;")}</div>`).join("");
 }
 
 /* ================= home rendering ================= */
-const GABLES=[
-  "M25 2 L40 14 L40 40 L10 40 L10 14 Z",
-  "M10 40 L10 16 L15 16 L15 10 L20 10 L20 5 L30 5 L30 10 L35 10 L35 16 L40 16 L40 40 Z",
-  "M10 40 L10 18 C10 8 18 4 25 4 C32 4 40 8 40 18 L40 40 Z",
-  "M10 40 L10 14 L18 14 L18 6 L32 6 L32 14 L40 14 L40 40 Z"
-];
-// simplified dalahäst (Dala horse) silhouette, single consistent shape
-const DALA=["M6 34 L6 24 C6 17 11 12 17 11 L16 9 C15 7 16 5 18 5 L23 5 C25 5 26 7 25 9 L24 12 L30 12 C35 12 38 16 38 20 L40 20 L40 26 L38 26 L38 20 C38 20 37 24 33 25 L33 34 L27 34 L27 27 L17 27 L17 34 Z"];
-const PROFILE_ICONS={nl:GABLES,sv:DALA};
 function renderHome(){
-  document.getElementById("gevelsLabel").textContent=activeId==="sv"?"Deze week bij de dalahäst":"Deze week aan de gracht";
-  const icons=PROFILE_ICONS[activeId];
+  const t=T();
+  document.getElementById("gevelsLabel").textContent=PROFILE.streakLabel;
+  const icons=PROFILE.icons;
   const row=document.getElementById("gevelRow");row.innerHTML="";
   const now=new Date();
-  const dayNames=["zo","ma","di","wo","do","vr","za"];
+  const dayNames=PROFILE.uiLocale==="en"?["Su","Mo","Tu","We","Th","Fr","Sa"]:["zo","ma","di","wo","do","vr","za"];
   let streak=0;
   for(let i=0;;i++){const d=new Date(now-i*DAY);if(S.days[dateStr(d)])streak++;else{if(i===0)continue;break}if(i>3650)break}
   for(let i=6;i>=0;i--){
@@ -718,14 +881,18 @@ function renderHome(){
   document.getElementById("stLearned").textContent=started;
   document.getElementById("stDue").textContent=due;
   document.getElementById("stStreak").textContent=streak;
+  document.getElementById("stLearned").nextElementSibling.textContent=t.stLearnedLabel;
+  document.getElementById("stDue").nextElementSibling.textContent=t.stDueLabel;
+  document.getElementById("stStreak").nextElementSibling.textContent=t.stStreakLabel;
+  document.getElementById("btnStart").textContent=t.startBtn;
   const btn=document.getElementById("btnStart");
   const note=document.getElementById("sessNote");
-  if(due+fresh===0){btn.disabled=true;note.textContent="Alles klaar voor vandaag — tot morgen! 🌷"}
-  else{btn.disabled=false;note.textContent=`${due} te herhalen · ${fresh} nieuw${fresh===1?"":"e"} — ± ${Math.max(1,Math.round((due+fresh)*0.3))} min`}
+  if(due+fresh===0){btn.disabled=true;note.textContent=t.allDoneNote}
+  else{btn.disabled=false;note.textContent=`${due} ${t.dueLabel} · ${fresh} ${fresh===1?t.newLabel:t.newLabelPlural} — ± ${Math.max(1,Math.round((due+fresh)*0.3))} ${t.minLabel}`}
   const open=STORIES.filter(st=>started>=st.m).length;
-  document.getElementById("lezenNote").textContent=open+"/"+STORIES.length+" verhalen";
+  document.getElementById("lezenNote").textContent=open+"/"+STORIES.length+" "+t.storiesLabel;
   const grads=graduatedIds().length;
-  document.getElementById("schrijfNote").textContent=S.journal.length?S.journal.length+" stukjes":"zelf zinnen maken";
+  document.getElementById("schrijfNote").textContent=S.journal.length?S.journal.length+" "+t.entriesLabel:t.writeOwnSentencesLabel;
   document.getElementById("schrijfBadge").style.display=(grads>=15&&Date.now()-S.lastSchrijf>6*DAY)?"block":"none";
   document.querySelectorAll("#segNew button").forEach(b=>b.classList.toggle("on",+b.dataset.v===S.settings.newPerDay));
   document.querySelectorAll("#segMode button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.settings.mode));
@@ -749,18 +916,19 @@ document.getElementById("rStop").onclick=()=>speechSynthesis.cancel();
 document.getElementById("btnSaveEntry").onclick=saveEntry;
 document.getElementById("btnAiCheck").onclick=aiCheck;
 document.getElementById("btnCopyPrompt").onclick=copyPrompt;
-document.getElementById("btnNewTargets").onclick=()=>{targetIds=[];pickTargets();updateTargets();toast("Nieuwe woorden gekozen")};
+document.getElementById("btnNewTargets").onclick=()=>{targetIds=[];pickTargets();updateTargets();toast(T().newWordsChosen)};
 document.getElementById("schrijfTxt").addEventListener("input",()=>updateTargets());
 document.getElementById("btnSettings").onclick=()=>document.getElementById("settingsPanel").classList.toggle("open");
 document.querySelectorAll("#segNew button").forEach(b=>b.onclick=()=>{S.settings.newPerDay=+b.dataset.v;save();renderHome()});
 document.querySelectorAll("#segMode button").forEach(b=>b.onclick=()=>{S.settings.mode=b.dataset.v;save();renderHome()});
-document.getElementById("apiKeyIn").addEventListener("change",e=>{S.settings.apiKey=e.target.value.trim();save();toast("Sleutel opgeslagen op dit apparaat")});
-document.getElementById("btnReset").onclick=()=>{if(confirm("Alle voortgang van dit profiel ("+PROFILE.tagline+") wissen? Het andere profiel blijft ongewijzigd. Dit kan niet ongedaan worden gemaakt.")){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast("Gereset")}};
+document.getElementById("apiKeyIn").addEventListener("change",e=>{S.settings.apiKey=e.target.value.trim();save();toast(T().keySaved)});
+document.getElementById("btnReset").onclick=()=>{if(confirm(T().resetConfirmTemplate(PROFILE.tagline))){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast(T().resetDone)}};
 document.getElementById("btnExport").onclick=()=>{
   const payload=Object.assign({_profile:activeId},S);
   const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
-  a.download=(activeId==="nl"?"duizend":"tusen")+"-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);
+  const fileTag=PROFILE.brandHtml.replace(/<[^>]+>/g,"").toLowerCase();
+  a.download=fileTag+"-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);
 };
 document.getElementById("btnImport").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=e=>{
@@ -769,21 +937,18 @@ document.getElementById("importFile").onchange=e=>{
   r.onload=()=>{
     try{
       const s=JSON.parse(r.result);if(!s.cards)throw 0;
-      if(s._profile&&s._profile!==activeId){
-        const otherName=s._profile==="nl"?"Nederlands":"Zweeds";
-        const thisName=activeId==="nl"?"Nederlands":"Zweeds";
-        toast("Dit bestand is van "+otherName+", niet "+thisName+". Wissel eerst van tabblad.");
+      if(s._profile&&s._profile!==activeId&&PROFILES[s._profile]){
+        const otherName=PROFILES[s._profile].tabLabel;
+        const thisName=PROFILE.tabLabel;
+        toast(T().wrongProfileFileTemplate(otherName,thisName));
         e.target.value="";return;
       }
       delete s._profile;
-      S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);save();renderHome();toast("Voortgang geïmporteerd ✓");
-    }catch(err){toast("Ongeldig bestand")}
+      S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);save();renderHome();toast(T().progressImported);
+    }catch(err){toast(T().invalidFile)}
   };
   r.readAsText(f);e.target.value="";
 };
-
-document.getElementById("tabNL").onclick=()=>{if(activeId!=="nl")setProfile("nl")};
-document.getElementById("tabSV").onclick=()=>{if(activeId!=="sv")setProfile("sv")};
 
 setProfile(activeId);
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{})}

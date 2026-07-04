@@ -1,7 +1,7 @@
 // Duizend dataset — v1, items 1-300 of the first 1000
 // w=Dutch word/chunk, s=Dutch sentence, e=English gloss, v=Swedish gloss,
 // x=English sentence (production prompt), t=theme(core/life/fam), c=cognate with Swedish
-const WORDS=[
+const WORDS_NL=[
 {i:1,w:"hallo",s:"Hallo, hoe gaat het?",e:"hello",v:"hej",x:"Hello, how are you?",t:"core",c:1},
 {i:2,w:"ja",s:"Ja, dat is goed.",e:"yes",v:"ja",x:"Yes, that is good.",t:"core",c:1},
 {i:3,w:"nee",s:"Nee, dank je.",e:"no",v:"nej",x:"No, thank you.",t:"core",c:1},

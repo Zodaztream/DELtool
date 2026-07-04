@@ -1,6 +1,6 @@
 // Lezen — graded mini-stories. m = words-started milestone to unlock.
 // gloss = words used that fall outside the learned range (the "i+1" items).
-const STORIES=[
+const STORIES_NL=[
 {m:50,t:"Koffie in de ochtend",txt:"Goedemorgen! Ik ben in het huis aan de gracht. Het is vroeg. Ik drink koffie met melk en ik eet brood met kaas. Mijn vriend slaapt nog. De stad is rustig en mooi. Vandaag ga ik naar het werk met de fiets. Het weer is goed. Wat een mooie dag!",gloss:{"nog":"still","rustig":"quiet"}},
 {m:100,t:"Naar de markt",txt:"Vandaag is het zaterdag. Wij gaan naar de markt. Op de markt kopen we brood, kaas, en bloemen. De kaas is lekker maar duur. Ik betaal met pin. Daarna drinken we koffie in een café bij de gracht. Mijn vriend eet een broodje. We praten en lachen. Het is druk in de stad, maar heel gezellig.",gloss:{"daarna":"after that","bloemen":"flowers","lachen":"to laugh"}},
 {m:150,t:"Een avond met de familie",txt:"Vanavond eten we bij zijn ouders. Zijn moeder kookt soep en zijn vader maakt het avondeten. Oma is er ook! Ze vertelt over vroeger. Ik versta niet alles, maar ik luister goed. Na het eten drinken we thee en eten we taart. Om elf uur gaan we naar huis. In de tram zegt mijn vriend: je Nederlands wordt steeds beter! Ik ben blij.",gloss:{"vertelt":"tells","vroeger":"the old days","wordt":"becomes"}},

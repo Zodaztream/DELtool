@@ -31,6 +31,9 @@ header::after{content:"";display:block;position:absolute;left:0;right:0;bottom:0
 .brand{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
 .brand em{font-style:normal;color:var(--yellow)}
 .tagline{font-size:13px;opacity:.85;margin-top:2px}
+.profiles{display:flex;gap:8px;margin-top:12px}
+.profilebtn{flex:1;background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:9px 8px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.profilebtn.on{background:var(--yellow);color:var(--blue-deep)}
 
 main{padding:20px 20px 40px}
 .screen{display:none}
@@ -169,15 +172,19 @@ main{padding:20px 20px 40px}
 <body>
 
 <header>
-  <div class="brand">Dui<em>zend</em></div>
-  <div class="tagline">Jouw eerste 1000 woorden Nederlands</div>
+  <div class="brand" id="brandTitle">Dui<em>zend</em></div>
+  <div class="tagline" id="brandTagline">Jouw eerste 1000 woorden Nederlands</div>
+  <div class="profiles">
+    <button class="profilebtn" id="tabNL">🇳🇱 Nederlands (jij)</button>
+    <button class="profilebtn" id="tabSV">🇸🇪 Zweeds (hij)</button>
+  </div>
 </header>
 
 <main>
   <!-- HOME -->
   <section class="screen active" id="scr-home">
     <div class="gevels">
-      <div class="gevels-label">Deze week aan de gracht</div>
+      <div class="gevels-label" id="gevelsLabel">Deze week aan de gracht</div>
       <div class="gevel-row" id="gevelRow"></div>
     </div>
     <div class="stats">
@@ -290,16 +297,39 @@ main{padding:20px 20px 40px}
 <div class="toast" id="toast"></div>
 
 <script src="./data.js"></script>
+<script src="./data-sv.js"></script>
 <script src="./stories.js"></script>
+<script src="./stories-sv.js"></script>
 <script>
 "use strict";
-/* ================= state & storage ================= */
-const KEY="duizend_v1";
+/* ================= profiles ================= */
+const PROFILES={
+  nl:{id:"nl",storageKey:"duizend_v1",brandHtml:"Dui<em>zend</em>",tagline:"Jouw eerste 1000 woorden Nederlands",
+      flag:"🇳🇱",nativeFlag:"🇸🇪",cognateLabel:"≈ Zweeds",ttsLang:"nl-NL",words:WORDS_NL,stories:STORIES_NL,
+      teacherLabel:"Dutch",typeLabel:"Typ het in het Nederlands"},
+  sv:{id:"sv",storageKey:"duizend_v1_sv",brandHtml:"Tu<em>sen</em>",tagline:"Je eerste 1000 woorden Zweeds",
+      flag:"🇸🇪",nativeFlag:"🇳🇱",cognateLabel:"≈ Nederlands",ttsLang:"sv-SE",words:WORDS_SV,stories:STORIES_SV,
+      teacherLabel:"Swedish",typeLabel:"Typ het in het Zweeds"}
+};
+var activeId=localStorage.getItem("duizend_active_profile")||"nl";
+var PROFILE,WORDS,STORIES,byId,S;
 const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:""},newLog:{date:"",count:0},journal:[],lastSchrijf:0};
-let S=load();
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Opslaan mislukt")}}
-const byId={};WORDS.forEach(w=>byId[w.i]=w);
+function loadState(key){try{const raw=localStorage.getItem(key);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
+function save(){try{localStorage.setItem(PROFILE.storageKey,JSON.stringify(S))}catch(e){toast("Opslaan mislukt")}}
+function setProfile(id){
+  if(PROFILE&&reviewedOk>0){S.days[today()]=true;save();reviewedOk=0}
+  activeId=id;localStorage.setItem("duizend_active_profile",id);
+  PROFILE=PROFILES[id];WORDS=PROFILE.words;STORIES=PROFILE.stories;
+  byId={};WORDS.forEach(w=>byId[w.i]=w);
+  S=loadState(PROFILE.storageKey);
+  nlVoice=null;pickVoice();
+  document.getElementById("brandTitle").innerHTML=PROFILE.brandHtml;
+  document.getElementById("brandTagline").textContent=PROFILE.tagline;
+  document.getElementById("tabNL").classList.toggle("on",id==="nl");
+  document.getElementById("tabSV").classList.toggle("on",id==="sv");
+  document.title=(id==="nl"?"Duizend":"Tusen")+" — leer "+(id==="nl"?"Nederlands":"Zweeds");
+  show("scr-home");
+}
 function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function dateStr(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 const DAY=86400000;
@@ -354,13 +384,13 @@ function graduatedIds(){return Object.keys(S.cards).filter(id=>(S.cards[id].r||0
 
 /* ================= speech ================= */
 let nlVoice=null;
-function pickVoice(){const vs=speechSynthesis.getVoices();nlVoice=vs.find(v=>v.lang==="nl-NL")||vs.find(v=>v.lang&&v.lang.startsWith("nl"))||null}
-if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function pickVoice(){const vs=speechSynthesis.getVoices();nlVoice=vs.find(v=>v.lang===PROFILE.ttsLang)||vs.find(v=>v.lang&&v.lang.startsWith(PROFILE.ttsLang.slice(0,2)))||null}
+if("speechSynthesis" in window){speechSynthesis.onvoiceschanged=pickVoice}
 function speak(txt,rate){
   if(!("speechSynthesis" in window))return toast("Geen audio beschikbaar");
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(txt);
-  u.lang="nl-NL";if(nlVoice)u.voice=nlVoice;u.rate=rate||0.92;
+  u.lang=PROFILE.ttsLang;if(nlVoice)u.voice=nlVoice;u.rate=rate||0.92;
   speechSynthesis.speak(u);
 }
 
@@ -376,14 +406,23 @@ function lev(a,b){
   return prev[n];
 }
 function similarity(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;const d=lev(a,b);return 1-d/Math.max(a.length,b.length)}
-function stripArticle(w){return norm(w).replace(/^(de|het|een)\s+/,"")}
+function stripArticle(w){return norm(w).replace(/^(de|het|een|en|ett)\s+/,"")}
+function hintFor(target){
+  const FILLERS=new Set(["att","de","het","een"]);
+  const words=target.split(" ").filter(Boolean);
+  let idx=0;
+  while(idx<words.length-1&&FILLERS.has(words[idx].toLowerCase()))idx++;
+  const w=words[idx]||target;
+  return w.length>2?w[0]+"…":w;
+}
 function textUsesWord(text,target){
   const toks=(" "+norm(text)+" ").split(" ").filter(Boolean);
-  return stripArticle(target).split(" ").every(t=>{
+  const alt=target.split("/").map(s=>stripArticle(s)).filter(Boolean);
+  return alt.some(form=>form.split(" ").every(t=>{
     if(t.length<=3)return toks.includes(t);
     const stem=t.slice(0,Math.max(4,t.length-2));
     return toks.some(tok=>tok.startsWith(stem));
-  });
+  }));
 }
 
 /* ================= session flow ================= */
@@ -411,7 +450,7 @@ function renderCard(){
   const id=queue[pos],w=byId[id],mode=currentModeFor(id);
   const K=document.getElementById("kaart");
   const isNew=!S.cards[id];
-  const cog=w.c?'<span class="cognate-tag">≈ Zweeds</span>':"";
+  const cog=w.c?`<span class="cognate-tag">${PROFILE.cognateLabel}</span>`:"";
   if(mode==="flash"){
     K.innerHTML=`
       <div class="mode-tag"><span>${isNew?"Nieuw woord":"Herhaling"}</span>${cog}</div>
@@ -421,7 +460,7 @@ function renderCard(){
       </div>
       <div class="answer" id="ans">
         <p class="gloss">${w.e}</p>
-        <p class="sv">🇸🇪 <b>${w.v}</b></p>
+        <p class="sv">${PROFILE.nativeFlag} <b>${w.v}</b></p>
         <p class="xen">${w.x}</p>
         <div class="shadow-tip">🗣 Zeg de zin hardop na — dat traint je uitspraak.<button id="shadowBtn">🐢 Nog eens</button></div>
       </div>
@@ -445,9 +484,9 @@ function renderCard(){
     K.querySelector(".b-easy").onclick=()=>grade(id,"easy");
   }else{
     K.innerHTML=`
-      <div class="mode-tag"><span>Typ het in het Nederlands</span>${cog}</div>
+      <div class="mode-tag"><span>${PROFILE.typeLabel}</span>${cog}</div>
       <p class="prompt-en">“${w.x}”</p>
-      <p class="zin" style="color:var(--muted);font-size:14px">hint: ${w.e} → <b>${w.w.split(" ")[0].length>2?w.w[0]+"…":w.w}</b></p>
+      <p class="zin" style="color:var(--muted);font-size:14px">hint: ${w.e} → <b>${hintFor(w.w)}</b></p>
       <div class="typebox">
         <input type="text" id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Typ de Nederlandse zin…">
       </div>
@@ -472,14 +511,14 @@ function renderCard(){
         document.getElementById("fbNext").onclick=()=>grade(id,sim>=0.97?"easy":"good");
       }else if(sim>=0.55){
         fb.className="feedback show close";
-        fb.innerHTML=`Bijna! Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — 🇸🇪 ${w.v})</span>`;
+        fb.innerHTML=`Bijna! Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — ${PROFILE.nativeFlag} ${w.v})</span>`;
         document.getElementById("fbAgain").style.display="block";
         document.getElementById("fbNext").textContent="Ik had het";
         document.getElementById("fbAgain").onclick=()=>grade(id,"again");
         document.getElementById("fbNext").onclick=()=>grade(id,"good");
       }else{
         fb.className="feedback show no";
-        fb.innerHTML=`Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — 🇸🇪 ${w.v})</span>`;
+        fb.innerHTML=`Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — ${PROFILE.nativeFlag} ${w.v})</span>`;
         document.getElementById("fbNext").textContent="Verder";
         document.getElementById("fbNext").onclick=()=>grade(id,"again");
       }
@@ -537,17 +576,18 @@ function openReader(idx){
   document.getElementById("glossBar").classList.remove("show");
   show("scr-reader");
 }
+function altForms(w){return w.split("/").map(s=>stripArticle(s.trim())).filter(Boolean)}
 function showGloss(tok){
   const t=norm(tok);if(!t)return;
   const bar=document.getElementById("glossBar");
   let g=null;
   if(curStory.gloss){for(const k in curStory.gloss){if(stripArticle(k)===t||norm(k)===t){g=curStory.gloss[k];break}}}
   if(!g){
-    const hit=WORDS.find(w=>stripArticle(w.w)===t)
-      ||WORDS.find(w=>stripArticle(w.w).split(" ").includes(t))
-      ||WORDS.find(w=>{const e=stripArticle(w.w);return e.length>=4&&t.startsWith(e)&&t.length-e.length<=3}) // tapped word is inflection of entry (woorden -> woord)
-      ||WORDS.find(w=>{const e=stripArticle(w.w);return t.length>=4&&e.startsWith(t)&&e.length-t.length<=3});  // entry is longer form of tapped word
-    if(hit)g=hit.e+" · 🇸🇪 "+hit.v;
+    const hit=WORDS.find(w=>altForms(w.w).includes(t))
+      ||WORDS.find(w=>altForms(w.w).some(a=>a.split(" ").includes(t)))
+      ||WORDS.find(w=>altForms(w.w).some(a=>a.length>=4&&t.startsWith(a)&&t.length-a.length<=3)) // tapped word is inflection of entry (woorden -> woord)
+      ||WORDS.find(w=>altForms(w.w).some(a=>t.length>=4&&a.startsWith(t)&&a.length-t.length<=3));  // entry is longer form of tapped word
+    if(hit)g=hit.e+" · "+PROFILE.nativeFlag+" "+hit.v;
   }
   bar.innerHTML=g?`<b>${tok.replace(/[.,!?]/g,"")}</b> — ${g}`:`<b>${tok.replace(/[.,!?]/g,"")}</b> — nog niet in je woordenlijst`;
   bar.classList.add("show");
@@ -606,7 +646,9 @@ function saveEntry(){
   toast(`Opgeslagen — ${used.length}/${targetIds.length} woorden gebruikt ✓`);
   targetIds=[];renderSchrijf();
 }
-const AI_PROMPT=`You are a friendly Dutch teacher. A Swedish learner living in Amsterdam wrote this short Dutch text. 1) Give a corrected version. 2) List the 2-4 most important corrections with a one-line explanation each (in English). 3) End with one short encouragement in Dutch. Keep it concise. Text:\n\n`;
+function buildAiPrompt(){
+  return `You are a friendly ${PROFILE.teacherLabel} teacher. A learner living in Amsterdam (native speaker of the other partner's language) wrote this short ${PROFILE.teacherLabel} text. 1) Give a corrected version. 2) List the 2-4 most important corrections with a one-line explanation each (in English). 3) End with one short encouragement in ${PROFILE.teacherLabel}. Keep it concise. Text:\n\n`;
+}
 async function aiCheck(){
   const text=document.getElementById("schrijfTxt").value.trim();
   if(!text)return toast("Schrijf eerst iets");
@@ -618,7 +660,7 @@ async function aiCheck(){
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
       headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:700,messages:[{role:"user",content:AI_PROMPT+text}]})
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:700,messages:[{role:"user",content:buildAiPrompt()+text}]})
     });
     if(!res.ok)throw new Error("API "+res.status);
     const data=await res.json();
@@ -630,7 +672,7 @@ async function aiCheck(){
 function copyPrompt(){
   const text=document.getElementById("schrijfTxt").value.trim();
   if(!text)return toast("Schrijf eerst iets");
-  const full=AI_PROMPT+text;
+  const full=buildAiPrompt()+text;
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(full).then(()=>toast("Gekopieerd — plak in een AI-app")).catch(()=>toast("Kopiëren mislukt"));
   }else toast("Kopiëren niet beschikbaar");
@@ -649,7 +691,12 @@ const GABLES=[
   "M10 40 L10 18 C10 8 18 4 25 4 C32 4 40 8 40 18 L40 40 Z",
   "M10 40 L10 14 L18 14 L18 6 L32 6 L32 14 L40 14 L40 40 Z"
 ];
+// simplified dalahäst (Dala horse) silhouette, single consistent shape
+const DALA=["M6 34 L6 24 C6 17 11 12 17 11 L16 9 C15 7 16 5 18 5 L23 5 C25 5 26 7 25 9 L24 12 L30 12 C35 12 38 16 38 20 L40 20 L40 26 L38 26 L38 20 C38 20 37 24 33 25 L33 34 L27 34 L27 27 L17 27 L17 34 Z"];
+const PROFILE_ICONS={nl:GABLES,sv:DALA};
 function renderHome(){
+  document.getElementById("gevelsLabel").textContent=activeId==="sv"?"Deze week bij de dalahäst":"Deze week aan de gracht";
+  const icons=PROFILE_ICONS[activeId];
   const row=document.getElementById("gevelRow");row.innerHTML="";
   const now=new Date();
   const dayNames=["zo","ma","di","wo","do","vr","za"];
@@ -660,7 +707,7 @@ function renderHome(){
     const div=document.createElement("div");
     div.className="gevel"+(done?" done":"")+(i===0?" today":"");
     div.innerHTML=`<svg viewBox="0 0 50 40" preserveAspectRatio="xMidYMax meet">
-      <path class="body" d="${GABLES[(7-i)%4]}"/>
+      <path class="body" d="${icons[(7-i)%icons.length]}"/>
       <rect class="win" x="21" y="22" width="8" height="7" rx="1"/>
       <rect class="win" x="21" y="32" width="8" height="8" rx="1"/></svg>
       <span class="day">${dayNames[d.getDay()]}</span>`;
@@ -708,21 +755,37 @@ document.getElementById("btnSettings").onclick=()=>document.getElementById("sett
 document.querySelectorAll("#segNew button").forEach(b=>b.onclick=()=>{S.settings.newPerDay=+b.dataset.v;save();renderHome()});
 document.querySelectorAll("#segMode button").forEach(b=>b.onclick=()=>{S.settings.mode=b.dataset.v;save();renderHome()});
 document.getElementById("apiKeyIn").addEventListener("change",e=>{S.settings.apiKey=e.target.value.trim();save();toast("Sleutel opgeslagen op dit apparaat")});
-document.getElementById("btnReset").onclick=()=>{if(confirm("Alles wissen? Dit kan niet ongedaan worden gemaakt.")){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast("Gereset")}};
+document.getElementById("btnReset").onclick=()=>{if(confirm("Alle voortgang van dit profiel ("+PROFILE.tagline+") wissen? Het andere profiel blijft ongewijzigd. Dit kan niet ongedaan worden gemaakt.")){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast("Gereset")}};
 document.getElementById("btnExport").onclick=()=>{
-  const blob=new Blob([JSON.stringify(S)],{type:"application/json"});
+  const payload=Object.assign({_profile:activeId},S);
+  const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
-  a.download="duizend-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);
+  a.download=(activeId==="nl"?"duizend":"tusen")+"-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);
 };
 document.getElementById("btnImport").onclick=()=>document.getElementById("importFile").click();
 document.getElementById("importFile").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=()=>{try{const s=JSON.parse(r.result);if(!s.cards)throw 0;S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);save();renderHome();toast("Voortgang geïmporteerd ✓")}catch(err){toast("Ongeldig bestand")}};
+  r.onload=()=>{
+    try{
+      const s=JSON.parse(r.result);if(!s.cards)throw 0;
+      if(s._profile&&s._profile!==activeId){
+        const otherName=s._profile==="nl"?"Nederlands":"Zweeds";
+        const thisName=activeId==="nl"?"Nederlands":"Zweeds";
+        toast("Dit bestand is van "+otherName+", niet "+thisName+". Wissel eerst van tabblad.");
+        e.target.value="";return;
+      }
+      delete s._profile;
+      S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);save();renderHome();toast("Voortgang geïmporteerd ✓");
+    }catch(err){toast("Ongeldig bestand")}
+  };
   r.readAsText(f);e.target.value="";
 };
 
-renderHome();
+document.getElementById("tabNL").onclick=()=>{if(activeId!=="nl")setProfile("nl")};
+document.getElementById("tabSV").onclick=()=>{if(activeId!=="sv")setProfile("sv")};
+
+setProfile(activeId);
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{})}
 </script>
 </body>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Duizend — leer Nederlands</title>
+<meta name="theme-color" content="#003082">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Duizend">
+<style>
+:root{
+  --blue:#003082; --blue-deep:#001d52; --yellow:#FFC917; --paper:#F4F5F1;
+  --ink:#10254E; --oranje:#E8590C; --line:#D9DDE6; --muted:#6B7590;
+  --ok:#1E7A4C; --err:#B3261E; --card:#FFFFFF;
+  --disp:"Futura","Avenir Next","Century Gothic","Trebuchet MS",sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--body);background:var(--paper);color:var(--ink);
+  padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
+  max-width:520px;margin:0 auto}
+button{font-family:inherit;cursor:pointer;border:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--oranje);outline-offset:2px}
+
+/* ---------- header: NS wayfinding sign ---------- */
+header{background:var(--blue);color:#fff;padding:18px 20px 14px;position:relative}
+header::after{content:"";display:block;position:absolute;left:0;right:0;bottom:0;height:6px;background:var(--yellow)}
+.brand{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
+.brand em{font-style:normal;color:var(--yellow)}
+.tagline{font-size:13px;opacity:.85;margin-top:2px}
+
+main{padding:20px 20px 40px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ---------- canal house streak ---------- */
+.gevels{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 14px 10px;margin-bottom:16px}
+.gevels-label{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.gevel-row{display:flex;align-items:flex-end;gap:4px;height:74px}
+.gevel{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.gevel svg{width:100%;height:56px;display:block}
+.gevel .day{font-size:10px;color:var(--muted);font-variant:tabular-nums}
+.gevel.today .day{font-weight:700;color:var(--blue)}
+.gevel svg .body{fill:#E7EAF1;stroke:var(--line);stroke-width:1}
+.gevel.done svg .body{fill:var(--oranje);stroke:var(--blue-deep)}
+.gevel svg .win{fill:#fff;opacity:0}
+.gevel.done svg .win{opacity:.9}
+
+/* ---------- stats ---------- */
+.stats{display:flex;gap:10px;margin-bottom:16px}
+.stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center}
+.stat b{display:block;font-family:var(--disp);font-size:26px;font-weight:800;color:var(--blue)}
+.stat span{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+.startbtn{width:100%;background:var(--yellow);color:var(--blue-deep);font-family:var(--disp);
+  font-size:19px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  padding:18px;border-radius:14px;border-bottom:4px solid #C79600}
+.startbtn:active{transform:translateY(2px);border-bottom-width:2px}
+.startbtn[disabled]{opacity:.5}
+.subnote{text-align:center;font-size:13px;color:var(--muted);margin-top:10px}
+
+.homelinks{display:flex;gap:8px;margin-top:22px}
+.homelinks button{flex:1;background:transparent;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;color:var(--ink)}
+
+/* ---------- settings ---------- */
+.settings{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:none}
+.settings.open{display:block}
+.setrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+.setrow label{font-size:14px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:#fff;padding:7px 12px;font-size:13px;color:var(--ink)}
+.seg button.on{background:var(--blue);color:#fff}
+
+/* ---------- session ---------- */
+.sess-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sess-top button{background:transparent;font-size:14px;color:var(--muted)}
+.prog{flex:1;height:8px;background:#E3E6EE;border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--blue);border-radius:4px;transition:width .3s}
+
+.kaart{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px;min-height:300px;display:flex;flex-direction:column}
+.kaart .mode-tag{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.cognate-tag{color:var(--oranje);font-size:11px;font-weight:700;letter-spacing:.1em}
+.kaart h2{font-family:var(--disp);font-size:34px;font-weight:800;color:var(--blue);margin-top:14px;line-height:1.15;overflow-wrap:break-word}
+.kaart .zin{font-size:19px;margin-top:10px;line-height:1.45}
+.kaart .prompt-en{font-size:20px;margin-top:14px;line-height:1.5;font-weight:600}
+.speak{background:var(--blue);color:#fff;border-radius:50%;width:40px;height:40px;font-size:18px;flex-shrink:0}
+.answer{border-top:2px dashed var(--line);margin-top:18px;padding-top:16px;display:none}
+.answer.show{display:block}
+.answer .gloss{font-size:18px;font-weight:600}
+.answer .sv{font-size:14px;color:var(--muted);margin-top:4px}
+.answer .sv b{color:var(--oranje);font-weight:700}
+.answer .xen{font-size:14px;color:var(--muted);margin-top:8px;font-style:italic}
+.spacer{flex:1}
+
+.btnrow{display:flex;gap:10px;margin-top:18px}
+.btnrow button{flex:1;padding:15px 6px;border-radius:12px;font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
+.b-reveal{background:var(--blue);color:#fff;border-bottom:4px solid var(--blue-deep)}
+.b-again{background:#F6E3E1;color:var(--err)}
+.b-good{background:var(--blue);color:#fff}
+.b-easy{background:var(--yellow);color:var(--blue-deep)}
+.b-check{background:var(--blue);color:#fff;border-bottom:4px solid var(--blue-deep)}
+.btnrow button:active{transform:translateY(1px)}
+
+.typebox{margin-top:16px}
+.typebox input{width:100%;padding:14px;font-size:17px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+.typebox input:focus{border-color:var(--blue)}
+.feedback{margin-top:14px;border-radius:12px;padding:14px;font-size:15px;display:none;line-height:1.5}
+.feedback.show{display:block}
+.feedback.ok{background:#E3F1E9;color:var(--ok)}
+.feedback.close{background:#FFF3D6;color:#7A5A00}
+.feedback.no{background:#F6E3E1;color:var(--err)}
+.feedback .correct-zin{font-weight:700;font-size:17px;display:block;margin-top:6px;color:var(--ink)}
+
+/* ---------- done ---------- */
+.done-wrap{text-align:center;padding-top:30px}
+.done-wrap svg{width:120px;height:96px}
+.done-wrap svg .body{fill:var(--oranje);stroke:var(--blue-deep);stroke-width:1.5}
+.done-wrap svg .win{fill:#fff}
+.done-wrap h2{font-family:var(--disp);font-size:30px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;margin-top:14px}
+.done-wrap p{margin-top:10px;color:var(--muted);font-size:15px;line-height:1.6}
+.done-wrap .startbtn{margin-top:26px}
+
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--blue-deep);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Dui<em>zend</em></div>
+  <div class="tagline">Jouw eerste 1000 woorden Nederlands</div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="screen active" id="scr-home">
+    <div class="gevels">
+      <div class="gevels-label">Deze week aan de gracht</div>
+      <div class="gevel-row" id="gevelRow"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="stLearned">0</b><span>geleerd</span></div>
+      <div class="stat"><b id="stDue">0</b><span>te herhalen</span></div>
+      <div class="stat"><b id="stStreak">0</b><span>dagen streak</span></div>
+    </div>
+    <button class="startbtn" id="btnStart">Start sessie</button>
+    <div class="subnote" id="sessNote"></div>
+    <div class="homelinks">
+      <button id="btnSettings">Instellingen</button>
+      <button id="btnExport">Exporteer</button>
+      <button id="btnImport">Importeer</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+    <div class="settings" id="settingsPanel">
+      <div class="setrow">
+        <label>Nieuwe woorden per dag</label>
+        <div class="seg" id="segNew">
+          <button data-v="3">3</button><button data-v="5">5</button><button data-v="8">8</button>
+        </div>
+      </div>
+      <div class="setrow">
+        <label>Oefenvorm</label>
+        <div class="seg" id="segMode">
+          <button data-v="auto">Mix</button><button data-v="flash">Kaarten</button><button data-v="type">Typen</button>
+        </div>
+      </div>
+      <div class="setrow">
+        <label>Alles resetten</label>
+        <div class="seg"><button id="btnReset" style="color:var(--err)">Reset</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SESSION -->
+  <section class="screen" id="scr-sess">
+    <div class="sess-top">
+      <button id="btnQuit">✕ Stop</button>
+      <div class="prog"><i id="progBar"></i></div>
+      <span id="progTxt" style="font-size:13px;color:var(--muted);font-variant:tabular-nums"></span>
+    </div>
+    <div class="kaart" id="kaart"></div>
+  </section>
+
+  <!-- DONE -->
+  <section class="screen" id="scr-done">
+    <div class="done-wrap">
+      <svg viewBox="0 0 50 40"><path class="body" d="M25 2 L38 12 L38 16 L42 16 L42 40 L8 40 L8 16 L12 16 L12 12 Z"/><rect class="win" x="20" y="18" width="10" height="8" rx="1"/><rect class="win" x="20" y="30" width="10" height="10" rx="1"/></svg>
+      <h2>Goed gedaan!</h2>
+      <p id="doneStats"></p>
+      <button class="startbtn" id="btnHome">Terug naar start</button>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="./data.js"></script>
+<script>
+"use strict";
+/* ================= state & storage ================= */
+const KEY="duizend_v1";
+const DEFAULT={cards:{},days:{},settings:{newPerDay:5,mode:"auto"},newLog:{date:"",count:0}};
+let S=load();
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);return Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})})}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Opslaan mislukt")}}
+const byId={};WORDS.forEach(w=>byId[w.i]=w);
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function dateStr(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+
+/* ================= SRS (simplified SM-2, cognate-boosted) ================= */
+const DAY=86400000;
+function schedule(c,grade,isCognate){
+  if(grade==="again"){c.ef=Math.max(1.3,(c.ef||2.5)-0.2);c.r=0;c.iv=0;return false}
+  c.ef=c.ef||2.5;
+  if(grade==="good"){
+    c.iv=c.iv?Math.round(c.iv*c.ef):(isCognate?2:1);
+  }else{ // easy
+    c.iv=c.iv?Math.round(c.iv*c.ef*1.35):(isCognate?4:2);
+    c.ef=Math.min(3.0,c.ef+0.05);
+  }
+  c.r=(c.r||0)+1;
+  c.due=Date.now()+c.iv*DAY;
+  return true;
+}
+
+/* ================= queue building ================= */
+function dueCards(){const now=Date.now();return Object.keys(S.cards).filter(id=>S.cards[id].due<=now).map(Number).sort((a,b)=>S.cards[a].due-S.cards[b].due)}
+function newAllowance(){if(S.newLog.date!==today()){S.newLog={date:today(),count:0}}return Math.max(0,S.settings.newPerDay-S.newLog.count)}
+function unseen(){return WORDS.filter(w=>!S.cards[w.i]).map(w=>w.i)}
+function buildQueue(){
+  const due=dueCards().slice(0,20);
+  const fresh=unseen().slice(0,newAllowance());
+  const q=[];let d=0,n=0;
+  // interleave: 2 reviews then 1 new
+  while(d<due.length||n<fresh.length){
+    if(d<due.length)q.push(due[d++]);
+    if(d<due.length)q.push(due[d++]);
+    if(n<fresh.length)q.push(fresh[n++]);
+  }
+  return q.slice(0,25);
+}
+
+/* ================= speech ================= */
+let nlVoice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();nlVoice=vs.find(v=>v.lang==="nl-NL")||vs.find(v=>v.lang&&v.lang.startsWith("nl"))||null}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(txt){
+  if(!("speechSynthesis" in window))return toast("Geen audio beschikbaar");
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang="nl-NL";if(nlVoice)u.voice=nlVoice;u.rate=0.92;
+  speechSynthesis.speak(u);
+}
+
+/* ================= fuzzy matching ================= */
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim()}
+function lev(a,b){
+  const m=a.length,n=b.length;if(!m)return n;if(!n)return m;
+  let prev=Array.from({length:n+1},(_,j)=>j),cur=new Array(n+1);
+  for(let i=1;i<=m;i++){cur[0]=i;
+    for(let j=1;j<=n;j++){cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1))}
+    [prev,cur]=[cur,prev];
+  }
+  return prev[n];
+}
+function similarity(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;const d=lev(a,b);return 1-d/Math.max(a.length,b.length)}
+
+/* ================= session flow ================= */
+let queue=[],pos=0,total=0,reviewedOk=0,againSet=new Set();
+
+function startSession(){
+  queue=buildQueue();
+  if(!queue.length)return;
+  pos=0;total=queue.length;reviewedOk=0;againSet=new Set();
+  show("scr-sess");renderCard();
+}
+function currentModeFor(id){
+  const c=S.cards[id];
+  const reps=c?c.r||0:0;
+  const pref=S.settings.mode;
+  if(!c||reps<2)return "flash";           // new & young cards: recognition
+  if(pref==="flash")return "flash";
+  return "type";                            // auto & type: production for mature
+}
+function updateProg(){
+  document.getElementById("progBar").style.width=Math.round(100*pos/Math.max(1,total))+"%";
+  document.getElementById("progTxt").textContent=Math.min(pos,total)+"/"+total;
+}
+function renderCard(){
+  updateProg();
+  if(pos>=queue.length)return finishSession();
+  const id=queue[pos],w=byId[id],mode=currentModeFor(id);
+  const K=document.getElementById("kaart");
+  const isNew=!S.cards[id];
+  const cog=w.c?'<span class="cognate-tag">≈ Zweeds</span>':"";
+  if(mode==="flash"){
+    K.innerHTML=`
+      <div class="mode-tag"><span>${isNew?"Nieuw woord":"Herhaling"}</span>${cog}</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div><h2>${w.w}</h2><p class="zin">${w.s}</p></div>
+        <button class="speak" aria-label="Luister">🔊</button>
+      </div>
+      <div class="answer" id="ans">
+        <p class="gloss">${w.e}</p>
+        <p class="sv">🇸🇪 <b>${w.v}</b></p>
+        <p class="xen">${w.x}</p>
+      </div>
+      <div class="spacer"></div>
+      <div class="btnrow" id="row1"><button class="b-reveal">Laat zien</button></div>
+      <div class="btnrow" id="row2" style="display:none">
+        <button class="b-again">Opnieuw</button>
+        <button class="b-good">Goed</button>
+        <button class="b-easy">Makkelijk</button>
+      </div>`;
+    K.querySelector(".speak").onclick=()=>speak(w.s);
+    K.querySelector(".b-reveal").onclick=()=>{
+      document.getElementById("ans").classList.add("show");
+      document.getElementById("row1").style.display="none";
+      document.getElementById("row2").style.display="flex";
+      speak(w.w);
+    };
+    K.querySelector(".b-again").onclick=()=>grade(id,"again");
+    K.querySelector(".b-good").onclick=()=>grade(id,"good");
+    K.querySelector(".b-easy").onclick=()=>grade(id,"easy");
+  }else{
+    K.innerHTML=`
+      <div class="mode-tag"><span>Typ het in het Nederlands</span>${cog}</div>
+      <p class="prompt-en">“${w.x}”</p>
+      <p class="zin" style="color:var(--muted);font-size:14px">hint: ${w.e} → <b>${w.w.split(" ")[0].length>2?w.w[0]+"…":w.w}</b></p>
+      <div class="typebox">
+        <input type="text" id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Typ de Nederlandse zin…">
+      </div>
+      <div class="feedback" id="fb"></div>
+      <div class="spacer"></div>
+      <div class="btnrow" id="rowCheck"><button class="b-check">Controleer</button></div>
+      <div class="btnrow" id="rowNext" style="display:none">
+        <button class="b-again" id="fbAgain" style="display:none">Opnieuw</button>
+        <button class="b-good" id="fbNext">Volgende</button>
+      </div>`;
+    const inp=K.querySelector("#typeIn");
+    setTimeout(()=>inp.focus(),50);
+    const check=()=>{
+      const simFull=similarity(inp.value,w.s);
+      const simWord=similarity(inp.value,w.w);
+      const sim=Math.max(simFull,simWord);
+      const fb=document.getElementById("fb");
+      document.getElementById("rowCheck").style.display="none";
+      document.getElementById("rowNext").style.display="flex";
+      speak(w.s);
+      if(sim>=0.82){
+        fb.className="feedback show ok";
+        fb.innerHTML=`Goed! ✓<span class="correct-zin">${w.s}</span>`;
+        document.getElementById("fbNext").onclick=()=>grade(id,sim>=0.97?"easy":"good");
+      }else if(sim>=0.55){
+        fb.className="feedback show close";
+        fb.innerHTML=`Bijna! Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — 🇸🇪 ${w.v})</span>`;
+        document.getElementById("fbAgain").style.display="block";
+        document.getElementById("fbNext").textContent="Ik had het";
+        document.getElementById("fbAgain").onclick=()=>grade(id,"again");
+        document.getElementById("fbNext").onclick=()=>grade(id,"good");
+      }else{
+        fb.className="feedback show no";
+        fb.innerHTML=`Het juiste antwoord:<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e} — 🇸🇪 ${w.v})</span>`;
+        document.getElementById("fbNext").textContent="Verder";
+        document.getElementById("fbNext").onclick=()=>grade(id,"again");
+      }
+    };
+    K.querySelector(".b-check").onclick=check;
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();if(document.getElementById("rowCheck").style.display!=="none")check()}});
+  }
+}
+function grade(id,g){
+  const w=byId[id];
+  if(!S.cards[id]){
+    S.cards[id]={r:0,iv:0,ef:2.5,due:0};
+    S.newLog.count++;
+  }
+  const scheduled=schedule(S.cards[id],g,!!w.c);
+  if(scheduled){reviewedOk++}
+  else{
+    // requeue a few positions later, once flagged in this session
+    const insertAt=Math.min(queue.length,pos+4);
+    queue.splice(insertAt,0,id);
+    if(!againSet.has(id)){total++;againSet.add(id)}
+  }
+  pos++;save();renderCard();
+}
+function finishSession(){
+  if(reviewedOk>0){S.days[today()]=true;save()}
+  document.getElementById("doneStats").textContent=
+    `${reviewedOk} kaarten afgerond · ${Object.keys(S.cards).length} van de ${WORDS.length} woorden gestart`;
+  show("scr-done");
+}
+
+/* ================= home rendering ================= */
+const GABLES=[ // four Amsterdam gable silhouettes (viewBox 0 0 50 40)
+  "M25 2 L40 14 L40 40 L10 40 L10 14 Z",                                   // spout
+  "M10 40 L10 16 L15 16 L15 10 L20 10 L20 5 L30 5 L30 10 L35 10 L35 16 L40 16 L40 40 Z", // step
+  "M10 40 L10 18 C10 8 18 4 25 4 C32 4 40 8 40 18 L40 40 Z",               // bell
+  "M10 40 L10 14 L18 14 L18 6 L32 6 L32 14 L40 14 L40 40 Z"                // neck
+];
+function renderHome(){
+  // streak houses: trailing 7 days
+  const row=document.getElementById("gevelRow");row.innerHTML="";
+  const now=new Date();
+  const dayNames=["zo","ma","di","wo","do","vr","za"];
+  let streak=0;
+  for(let i=0;;i++){const d=new Date(now-i*DAY);if(S.days[dateStr(d)])streak++;else{if(i===0)continue;break}if(i>3650)break}
+  for(let i=6;i>=0;i--){
+    const d=new Date(now-i*DAY),ds=dateStr(d),done=!!S.days[ds];
+    const div=document.createElement("div");
+    div.className="gevel"+(done?" done":"")+(i===0?" today":"");
+    div.innerHTML=`<svg viewBox="0 0 50 40" preserveAspectRatio="xMidYMax meet">
+      <path class="body" d="${GABLES[(7-i)%4]}"/>
+      <rect class="win" x="21" y="22" width="8" height="7" rx="1"/>
+      <rect class="win" x="21" y="32" width="8" height="8" rx="1"/></svg>
+      <span class="day">${dayNames[d.getDay()]}</span>`;
+    row.appendChild(div);
+  }
+  const due=dueCards().length,fresh=Math.min(newAllowance(),unseen().length);
+  document.getElementById("stLearned").textContent=Object.keys(S.cards).length;
+  document.getElementById("stDue").textContent=due;
+  document.getElementById("stStreak").textContent=streak;
+  const btn=document.getElementById("btnStart");
+  const note=document.getElementById("sessNote");
+  if(due+fresh===0){btn.disabled=true;note.textContent="Alles klaar voor vandaag — tot morgen! 🌷"}
+  else{btn.disabled=false;note.textContent=`${due} te herhalen · ${fresh} nieuw${fresh===1?"":"e"} — ± ${Math.max(1,Math.round((due+fresh)*0.3))} min`}
+  // settings UI
+  document.querySelectorAll("#segNew button").forEach(b=>b.classList.toggle("on",+b.dataset.v===S.settings.newPerDay));
+  document.querySelectorAll("#segMode button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.settings.mode));
+}
+
+/* ================= navigation & misc ================= */
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");if(id==="scr-home")renderHome()}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+
+document.getElementById("btnStart").onclick=startSession;
+document.getElementById("btnQuit").onclick=()=>{if(reviewedOk>0){S.days[today()]=true;save()}show("scr-home")};
+document.getElementById("btnHome").onclick=()=>show("scr-home");
+document.getElementById("btnSettings").onclick=()=>document.getElementById("settingsPanel").classList.toggle("open");
+document.querySelectorAll("#segNew button").forEach(b=>b.onclick=()=>{S.settings.newPerDay=+b.dataset.v;save();renderHome()});
+document.querySelectorAll("#segMode button").forEach(b=>b.onclick=()=>{S.settings.mode=b.dataset.v;save();renderHome()});
+document.getElementById("btnReset").onclick=()=>{if(confirm("Alles wissen? Dit kan niet ongedaan worden gemaakt.")){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast("Gereset")}};
+document.getElementById("btnExport").onclick=()=>{
+  const blob=new Blob([JSON.stringify(S)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="duizend-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);
+};
+document.getElementById("btnImport").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const s=JSON.parse(r.result);if(!s.cards)throw 0;S=Object.assign({},DEFAULT,s);save();renderHome();toast("Voortgang geïmporteerd ✓")}catch(err){toast("Ongeldig bestand")}};
+  r.readAsText(f);e.target.value="";
+};
+
+renderHome();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{})}
+</script>
+</body>
+</html>

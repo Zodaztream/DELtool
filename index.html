@@ -297,9 +297,11 @@ main{padding:20px 20px 40px}
 <script src="./data.js"></script>
 <script src="./data-sv.js"></script>
 <script src="./data-es.js"></script>
+<script src="./data-fr.js"></script>
 <script src="./stories.js"></script>
 <script src="./stories-sv.js"></script>
 <script src="./stories-es.js"></script>
+<script src="./stories-fr.js"></script>
 <script>
 "use strict";
 /* ================= i18n ================= */
@@ -410,6 +412,8 @@ const GABLES=[
 ];
 // stylized flamenco guitar body silhouette
 const GUITAR=["M25 3 C32 3 36 8 35 13 C34 17 32 17 33 21 C34 25 37 29 35 33 C33 37 29 38 25 38 C21 38 17 37 15 33 C13 29 16 25 17 21 C18 17 16 17 15 13 C14 8 18 3 25 3 Z"];
+// stylized Eiffel Tower silhouette
+const EIFFEL=["M25 2 L28 16 L34 16 L36 22 L30 22 L33 38 L26 38 L25 24 L24 38 L17 38 L20 22 L14 22 L16 16 L22 16 Z"];
 const PROFILES={
   nl:{id:"nl",storageKey:"duizend_v1",brandHtml:"Dui<em>zend</em>",tagline:"Jouw eerste 1000 woorden Nederlands",
       tabLabel:"🇳🇱 Nederlands",flag:"🇳🇱",nativeFlag:"🇸🇪",cognateLabel:"≈ Zweeds",ttsLang:"nl-NL",
@@ -426,9 +430,15 @@ const PROFILES={
       words:(typeof WORDS_ES!=="undefined"?WORDS_ES:[]),stories:(typeof STORIES_ES!=="undefined"?STORIES_ES:[]),
       teacherLabel:"Spanish",typeLabel:"Type it in Spanish",
       typePlaceholder:"Type the Spanish sentence…",uiLocale:"en",icons:GUITAR,streakLabel:"This week with the guitar",
+      showNativeLine:false},
+  fr:{id:"fr",storageKey:"duizend_v1_fr",brandHtml:"Mil<em>le</em>",tagline:"Your first 1000 French words",
+      tabLabel:"🇫🇷 Français",flag:"🇫🇷",nativeFlag:"🇬🇧",cognateLabel:"≈ English",ttsLang:"fr-FR",
+      words:(typeof WORDS_FR!=="undefined"?WORDS_FR:[]),stories:(typeof STORIES_FR!=="undefined"?STORIES_FR:[]),
+      teacherLabel:"French",typeLabel:"Type it in French",
+      typePlaceholder:"Type the French sentence…",uiLocale:"en",icons:EIFFEL,streakLabel:"This week under the Eiffel Tower",
       showNativeLine:false}
 };
-const PROFILE_ORDER=["nl","sv","es"];
+const PROFILE_ORDER=["nl","sv","es","fr"];
 var activeId=localStorage.getItem("duizend_active_profile")||"nl";
 if(!PROFILES[activeId])activeId="nl";
 var PROFILE,WORDS,STORIES,byId,S;
@@ -570,9 +580,10 @@ function lev(a,b){
   return prev[n];
 }
 function similarity(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;const d=lev(a,b);return 1-d/Math.max(a.length,b.length)}
-function stripArticle(w){return norm(w).replace(/^(de|het|een|en|ett|el|la|los|las)\s+/,"")}
+function stripArticle(w){return norm(w).replace(/^(de|het|een|en|ett|el|la|los|las|le|les|un|une|des|l)\s+/,"")}
 function hintFor(target){
-  const FILLERS=new Set(["att","de","het","een","el","la","los","las"]);
+  const FILLERS=new Set(["att","de","het","een","el","la","los","las","le","les","un","une","des"]);
+  target=target.replace(/^l'/i,"");
   const words=target.split(" ").filter(Boolean);
   let idx=0;
   while(idx<words.length-1&&FILLERS.has(words[idx].toLowerCase()))idx++;

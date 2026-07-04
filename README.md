@@ -1,83 +1,84 @@
-# Duizend / Tusen / Mil — jouw eerste 1000 woorden
+# Duizend / Tusen / Mil / Mille — jouw eerste 1000 woorden
 
-Offline-first language app, now generalized to support any number of
-independent learning profiles on one device: **Duizend** teaches Dutch
-(for the Swedish partner), **Tusen** teaches Swedish (for the Dutch
-partner), **Mil** teaches Spanish (Spain, general-purpose, for English
-speakers) — same app, same phone, switchable with one tap, fully
-independent progress per profile.
+Offline-first language app supporting any number of independent learning
+profiles on one device: **Duizend** teaches Dutch (for the Swedish
+partner), **Tusen** teaches Swedish (for the Dutch partner), **Mil**
+teaches Spanish (Spain, general-purpose, English speakers), **Mille**
+teaches French (France, general-purpose, English speakers) — same app,
+same phone, switchable with one tap, fully independent progress per
+profile.
 
 ## Update an existing deployment
 
-Add two new files (`data-es.js`, `stories-es.js`) alongside the existing
-ones, and replace `index.html` and `sw.js`. Cache bumps to `duizend-v7`
-so phones auto-update. **Your existing Dutch and Swedish progress is
-untouched** — each still lives under its own storage key; Spanish uses a
-new, separate key.
+Add two new files (`data-fr.js`, `stories-fr.js`) alongside the existing
+ones, and replace `index.html` and `sw.js`. Cache bumps to `duizend-v8`
+so phones auto-update. **All existing progress (Dutch, Swedish, Spanish)
+is untouched** — each lives under its own storage key; French uses a new,
+separate key.
 
 ## First deployment (3 steps)
 
 1. Create a public repo on github.com (e.g. `duizend`).
 2. Upload: `index.html`, `data.js`, `data-sv.js`, `data-es.js`,
-   `stories.js`, `stories-sv.js`, `stories-es.js`, `manifest.json`,
-   `sw.js`, `icon-180.png`, `icon-512.png`.
+   `data-fr.js`, `stories.js`, `stories-sv.js`, `stories-es.js`,
+   `stories-fr.js`, `manifest.json`, `sw.js`, `icon-180.png`,
+   `icon-512.png`.
 3. Settings → Pages → Deploy from branch `main`, folder `/ (root)`.
 Then on iPhone: open the URL in Safari → Share → **Add to Home Screen**.
 
 ## N profiles, one device
 
-The header now renders a horizontally-scrollable row of tabs generated
-from a `PROFILES` config object — adding a fourth, fifth, etc. language
-in the future means adding one config entry and two content files, not
-touching the header markup or click-handling code. Each profile has its
-own: word progress, streak, journal, and settings, stored under separate
-localStorage keys so borrowing the phone never mixes progress.
+The header renders a horizontally-scrollable row of tabs generated from
+a `PROFILES` config object — adding a fifth language means adding one
+config entry and two content files, not touching the header markup or
+click-handling code. Each profile has its own: word progress, streak,
+journal, and settings, stored under separate localStorage keys so
+borrowing the phone never mixes progress.
 
-**UI chrome language is now per-profile, not fixed.** Dutch and Swedish
-keep Dutch chrome (native language for one partner, light immersion for
-the other — unchanged from before). Spanish/Mil uses **English** chrome
-instead, because its learner's native language is English and Dutch
-button labels would just be friction, not immersion. This is driven by
-a small `UI_STRINGS` dictionary (`nl` / `en`) and each profile's
-`uiLocale` field — a future profile for, say, a German speaker learning
-French could set `uiLocale: "nl"`, `"en"`, or a new locale added to the
-dictionary, whichever actually helps that learner.
+**UI chrome language is per-profile.** Dutch and Swedish keep Dutch
+chrome; Spanish and French both use English chrome, since both learners'
+native language is English and Dutch button labels would just be
+friction, not immersion. Driven by a small `UI_STRINGS` dictionary
+(`nl` / `en`) and each profile's `uiLocale` field.
 
-Two other things are now per-profile config rather than hardcoded:
+Per-profile config also covers:
 - **Streak icon**: canal-house gables (NL), dala horse (SV), flamenco
-  guitar body (ES) — set via `PROFILE.icons`.
-- **Native-language gloss line**: Dutch/Swedish show it (their learners'
-  native language differs from the English gloss already shown). Spanish
-  hides it (`showNativeLine: false`) since the learner's native language
-  *is* English — showing the English gloss twice would just be
+  guitar body (ES), Eiffel Tower (FR) — set via `PROFILE.icons`.
+- **Native-language gloss line**: shown for Dutch/Swedish (native
+  language differs from the English gloss already shown), hidden for
+  Spanish/French (`showNativeLine: false`) since the learner's native
+  language *is* English — showing the English gloss twice would just be
   duplicate clutter.
 
 ## Content design decisions
 
-- **Not a blind mirror.** Word frequency is language-specific — Spanish's
-  real top-1000 isn't a translation of Dutch's or Swedish's. The Mil
-  dataset is built from genuine Peninsular Spanish frequency and usage
-  (vosotros, coche, tú — Spain conventions, not Latin American ones).
-- **General-purpose, not couple-specific.** Unlike the Dutch/Swedish
-  tracks (built around a specific Amsterdam relationship), Mil is for a
-  general English-speaking learner: themes are daily life, travel, food,
-  work, and socializing rather than a specific household or relationship.
-  The AI-teacher prompt (`buildAiPrompt()`) was also genericized to drop
-  the old relationship-specific framing, so it now works for any learner.
-- **Genuine Spanish culture in the stories**, not reskinned Dutch/Swedish
-  ones: siesta, tapas, flamenco in Sevilla, the Camino de Santiago,
-  Nochevieja and the twelve grapes, Reyes Magos — the 20 Mil stories are
-  Spain-first, unlocking at the same 50-word milestones as the other
-  tracks.
-- **Spanish articles are handled like Dutch de/het.** Citation forms like
-  "la casa" or "el coche" needed the same treatment Dutch nouns already
-  got: `stripArticle()` and the typing-mode `hintFor()` filler-word list
-  were extended to strip `el/la/los/las`, so hints and Schrijven word-
-  matching work correctly for Spanish nouns too. Checked for zero
-  collision risk against existing Dutch/Swedish vocabulary first.
-- **Cognates are symmetric within each language pair**, and Spanish gets
-  its own honest cognate count against English (214 of 1000) rather than
-  inheriting the Dutch/Swedish figures.
+- **Not a blind mirror.** Word frequency is language-specific — French's
+  real top-1000 isn't a translation of Dutch's, Swedish's, or Spanish's.
+  The Mille dataset is built from genuine spoken-French frequency and
+  usage (tu/vous, standard France conventions).
+- **General-purpose, not couple-specific**, matching the Mil (Spanish)
+  pattern rather than the original Amsterdam-relationship framing: themes
+  are daily life, travel, food, work, and socializing for a general
+  English-speaking learner.
+- **Genuine French culture in the stories**: café terrace culture,
+  crêpes, the Camino de Compostelle, Bastille Day imagery woven into the
+  vocabulary, bistrot culture, château day-trips — the 20 Mille stories
+  are France-first, not reskinned versions of the other tracks, unlocking
+  at the same 50-word milestones.
+- **French articles and elision are handled like Dutch de/het and
+  Spanish el/la.** Citation forms like "la maison", "le vélo", and
+  especially the elided "l'eau" / "l'ami" needed care: `stripArticle()`
+  and `hintFor()` now strip `le/la/les/un/une/des` and the apostrophe-
+  attached `l'` form (which has no space, so it's handled as a special
+  case rather than a simple filler-word list entry), so hints and
+  Schrijven word-matching work correctly for French nouns too. Checked
+  for collisions against all three existing languages first — the only
+  overlap found was a minor hint-quality *improvement* for one existing
+  Spanish entry, not a regression.
+- **Cognates are honestly counted per language**, not inherited: French
+  gets 270 of 1000 (Norman-French influence on English makes French the
+  highest cognate rate of the four tracks so far), separate from Dutch,
+  Swedish, and Spanish's own counts.
 
 ## The learning system (unchanged mechanics, research notes)
 
@@ -103,12 +104,16 @@ backup file belongs to a different profile.
 ## Editing content
 
 - Words: `data.js` (Dutch) / `data-sv.js` (Swedish) / `data-es.js`
-  (Spanish), unique `i` per file.
-- Stories: `stories.js` / `stories-sv.js` / `stories-es.js`, `m` = unlock
-  milestone.
-- Adding a fourth language: add a new `data-xx.js` / `stories-xx.js` pair,
+  (Spanish) / `data-fr.js` (French), unique `i` per file.
+- Stories: `stories.js` / `stories-sv.js` / `stories-es.js` /
+  `stories-fr.js`, `m` = unlock milestone.
+- Adding a fifth language: add a new `data-xx.js` / `stories-xx.js` pair,
   register a new entry in the `PROFILES` object and `PROFILE_ORDER` array
   in `index.html` (storage key, brand, flags, `ttsLang`, `uiLocale`,
   `icons`, `showNativeLine`), add its `<script src>` tags, and list the
-  two new files in `sw.js`'s `ASSETS`. No other code changes needed.
-- After any edit, bump the cache name in `sw.js` (v7 → v8).
+  two new files in `sw.js`'s `ASSETS`. If the new language uses elided
+  or unusual articles, check `stripArticle()` / `hintFor()` for whether
+  they need extending, and check for collisions against existing
+  vocabulary first — same pattern used for Spanish and French. No other
+  code changes needed.
+- After any edit, bump the cache name in `sw.js` (v8 → v9).

@@ -24,9 +24,8 @@ body{font-family:var(--body);background:var(--paper);color:var(--ink);
   padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
   max-width:520px;margin:0 auto}
 button{font-family:inherit;cursor:pointer;border:none}
-button:focus-visible,input:focus-visible{outline:3px solid var(--oranje);outline-offset:2px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--oranje);outline-offset:2px}
 
-/* ---------- header: NS wayfinding sign ---------- */
 header{background:var(--blue);color:#fff;padding:18px 20px 14px;position:relative}
 header::after{content:"";display:block;position:absolute;left:0;right:0;bottom:0;height:6px;background:var(--yellow)}
 .brand{font-family:var(--disp);font-weight:800;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
@@ -37,7 +36,6 @@ main{padding:20px 20px 40px}
 .screen{display:none}
 .screen.active{display:block}
 
-/* ---------- canal house streak ---------- */
 .gevels{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 14px 10px;margin-bottom:16px}
 .gevels-label{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .gevel-row{display:flex;align-items:flex-end;gap:4px;height:74px}
@@ -50,7 +48,6 @@ main{padding:20px 20px 40px}
 .gevel svg .win{fill:#fff;opacity:0}
 .gevel.done svg .win{opacity:.9}
 
-/* ---------- stats ---------- */
 .stats{display:flex;gap:10px;margin-bottom:16px}
 .stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center}
 .stat b{display:block;font-family:var(--disp);font-size:26px;font-weight:800;color:var(--blue)}
@@ -62,20 +59,24 @@ main{padding:20px 20px 40px}
 .startbtn:active{transform:translateY(2px);border-bottom-width:2px}
 .startbtn[disabled]{opacity:.5}
 .subnote{text-align:center;font-size:13px;color:var(--muted);margin-top:10px}
+.moderow{display:flex;gap:10px;margin-top:14px}
+.modebtn{flex:1;background:var(--blue);color:#fff;border-radius:14px;padding:14px 8px;font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;border-bottom:4px solid var(--blue-deep);position:relative}
+.modebtn small{display:block;font-family:var(--body);font-weight:400;font-size:11px;text-transform:none;letter-spacing:0;opacity:.8;margin-top:3px}
+.modebtn:active{transform:translateY(2px);border-bottom-width:2px}
+.modebtn .badge{position:absolute;top:-7px;right:-4px;background:var(--oranje);color:#fff;font-size:10px;font-family:var(--body);font-weight:700;padding:3px 8px;border-radius:10px;text-transform:none;letter-spacing:0}
 
 .homelinks{display:flex;gap:8px;margin-top:22px}
 .homelinks button{flex:1;background:transparent;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;color:var(--ink)}
-
-/* ---------- settings ---------- */
 .settings{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:none}
 .settings.open{display:block}
-.setrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+.setrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;gap:10px;flex-wrap:wrap}
 .setrow label{font-size:14px}
 .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{background:#fff;padding:7px 12px;font-size:13px;color:var(--ink)}
+.seg button{background:#fff;padding:7px 11px;font-size:13px;color:var(--ink)}
 .seg button.on{background:var(--blue);color:#fff}
+.keyinput{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+.sethint{font-size:11px;color:var(--muted);width:100%;line-height:1.4}
 
-/* ---------- session ---------- */
 .sess-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .sess-top button{background:transparent;font-size:14px;color:var(--muted)}
 .prog{flex:1;height:8px;background:#E3E6EE;border-radius:4px;overflow:hidden}
@@ -94,8 +95,9 @@ main{padding:20px 20px 40px}
 .answer .sv{font-size:14px;color:var(--muted);margin-top:4px}
 .answer .sv b{color:var(--oranje);font-weight:700}
 .answer .xen{font-size:14px;color:var(--muted);margin-top:8px;font-style:italic}
+.shadow-tip{margin-top:12px;background:#EEF2FA;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--blue);display:flex;align-items:center;gap:10px}
+.shadow-tip button{background:var(--blue);color:#fff;border-radius:8px;padding:7px 10px;font-size:12px;flex-shrink:0}
 .spacer{flex:1}
-
 .btnrow{display:flex;gap:10px;margin-top:18px}
 .btnrow button{flex:1;padding:15px 6px;border-radius:12px;font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
 .b-reveal{background:var(--blue);color:#fff;border-bottom:4px solid var(--blue-deep)}
@@ -104,7 +106,6 @@ main{padding:20px 20px 40px}
 .b-easy{background:var(--yellow);color:var(--blue-deep)}
 .b-check{background:var(--blue);color:#fff;border-bottom:4px solid var(--blue-deep)}
 .btnrow button:active{transform:translateY(1px)}
-
 .typebox{margin-top:16px}
 .typebox input{width:100%;padding:14px;font-size:17px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
 .typebox input:focus{border-color:var(--blue)}
@@ -115,7 +116,6 @@ main{padding:20px 20px 40px}
 .feedback.no{background:#F6E3E1;color:var(--err)}
 .feedback .correct-zin{font-weight:700;font-size:17px;display:block;margin-top:6px;color:var(--ink)}
 
-/* ---------- done ---------- */
 .done-wrap{text-align:center;padding-top:30px}
 .done-wrap svg{width:120px;height:96px}
 .done-wrap svg .body{fill:var(--oranje);stroke:var(--blue-deep);stroke-width:1.5}
@@ -124,9 +124,45 @@ main{padding:20px 20px 40px}
 .done-wrap p{margin-top:10px;color:var(--muted);font-size:15px;line-height:1.6}
 .done-wrap .startbtn{margin-top:26px}
 
+/* Lezen */
+.story-list{display:flex;flex-direction:column;gap:10px}
+.story-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;width:100%}
+.story-item h3{font-family:var(--disp);font-size:17px;color:var(--blue)}
+.story-item span{font-size:12px;color:var(--muted)}
+.story-item.locked{opacity:.5}
+.story-item .lock{font-size:20px}
+.reader{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 22px}
+.reader h2{font-family:var(--disp);font-size:26px;font-weight:800;color:var(--blue);margin-bottom:6px}
+.reader .rtools{display:flex;gap:8px;margin:10px 0 16px}
+.reader .rtools button{background:var(--blue);color:#fff;border-radius:10px;padding:9px 14px;font-size:13px}
+.reader .rtxt{font-size:19px;line-height:1.85}
+.reader .rtxt span.w{border-radius:4px;padding:1px 1px}
+.reader .rtxt span.w:active{background:var(--yellow)}
+.glossbar{position:sticky;bottom:10px;margin-top:18px;background:var(--blue-deep);color:#fff;border-radius:12px;padding:12px 14px;font-size:14px;display:none}
+.glossbar.show{display:block}
+.glossbar b{color:var(--yellow)}
+.readhint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center}
+
+/* Schrijven */
+.schrijf{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.schrijf h2{font-family:var(--disp);font-size:22px;font-weight:800;color:var(--blue)}
+.schrijf p.intro{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.5}
+.targets{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.target{background:#EEF2FA;color:var(--blue);border-radius:20px;padding:7px 13px;font-size:14px;font-weight:600}
+.target.used{background:#E3F1E9;color:var(--ok);text-decoration:line-through}
+.schrijf textarea{width:100%;min-height:150px;padding:14px;font-size:17px;line-height:1.5;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);resize:vertical;font-family:var(--body)}
+.schrijf textarea:focus{border-color:var(--blue)}
+.airesult{margin-top:14px;background:#EEF2FA;border-radius:12px;padding:14px;font-size:14px;line-height:1.6;white-space:pre-wrap;display:none}
+.airesult.show{display:block}
+.journal{margin-top:22px}
+.journal h3{font-family:var(--disp);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.jentry{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;font-size:14px;line-height:1.5}
+.jentry .jdate{font-size:11px;color:var(--muted);margin-bottom:4px}
+
+.backrow{margin-bottom:16px}
+.backrow button{background:transparent;font-size:14px;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--blue-deep);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
 .toast.show{opacity:1}
-
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -145,12 +181,16 @@ main{padding:20px 20px 40px}
       <div class="gevel-row" id="gevelRow"></div>
     </div>
     <div class="stats">
-      <div class="stat"><b id="stLearned">0</b><span>geleerd</span></div>
+      <div class="stat"><b id="stLearned">0</b><span>gestart</span></div>
       <div class="stat"><b id="stDue">0</b><span>te herhalen</span></div>
       <div class="stat"><b id="stStreak">0</b><span>dagen streak</span></div>
     </div>
     <button class="startbtn" id="btnStart">Start sessie</button>
     <div class="subnote" id="sessNote"></div>
+    <div class="moderow">
+      <button class="modebtn" id="btnLezen">Lezen<small id="lezenNote"></small></button>
+      <button class="modebtn" id="btnSchrijf">Schrijven<small id="schrijfNote"></small><span class="badge" id="schrijfBadge" style="display:none">tijd!</span></button>
+    </div>
     <div class="homelinks">
       <button id="btnSettings">Instellingen</button>
       <button id="btnExport">Exporteer</button>
@@ -161,7 +201,7 @@ main{padding:20px 20px 40px}
       <div class="setrow">
         <label>Nieuwe woorden per dag</label>
         <div class="seg" id="segNew">
-          <button data-v="3">3</button><button data-v="5">5</button><button data-v="8">8</button>
+          <button data-v="5">5</button><button data-v="8">8</button><button data-v="15">15</button><button data-v="20">20</button>
         </div>
       </div>
       <div class="setrow">
@@ -169,6 +209,11 @@ main{padding:20px 20px 40px}
         <div class="seg" id="segMode">
           <button data-v="auto">Mix</button><button data-v="flash">Kaarten</button><button data-v="type">Typen</button>
         </div>
+      </div>
+      <div class="setrow">
+        <label style="width:100%">Anthropic API-sleutel (optioneel, voor AI-controle bij Schrijven)</label>
+        <input type="password" class="keyinput" id="apiKeyIn" placeholder="sk-ant-…">
+        <span class="sethint">De sleutel blijft alleen op dit apparaat. Zonder sleutel kun je bij Schrijven een controle-prompt kopiëren en in een AI-app plakken.</span>
       </div>
       <div class="setrow">
         <label>Alles resetten</label>
@@ -196,36 +241,97 @@ main{padding:20px 20px 40px}
       <button class="startbtn" id="btnHome">Terug naar start</button>
     </div>
   </section>
+
+  <!-- LEZEN LIST -->
+  <section class="screen" id="scr-lezen">
+    <div class="backrow"><button class="backbtn">← Terug</button></div>
+    <div class="story-list" id="storyList"></div>
+    <p class="readhint">Nieuwe verhalen ontgrendel je door woorden te leren.</p>
+  </section>
+
+  <!-- READER -->
+  <section class="screen" id="scr-reader">
+    <div class="backrow"><button id="btnReaderBack">← Verhalen</button></div>
+    <div class="reader">
+      <h2 id="rTitle"></h2>
+      <div class="rtools">
+        <button id="rPlay">🔊 Luister</button>
+        <button id="rPlaySlow">🐢 Langzaam</button>
+        <button id="rStop">◼︎ Stop</button>
+      </div>
+      <div class="rtxt" id="rTxt"></div>
+      <div class="glossbar" id="glossBar"></div>
+      <p class="readhint">Tik op een woord voor de betekenis.</p>
+    </div>
+  </section>
+
+  <!-- SCHRIJVEN -->
+  <section class="screen" id="scr-schrijf">
+    <div class="backrow"><button class="backbtn">← Terug</button></div>
+    <div class="schrijf">
+      <h2>Schrijfsessie</h2>
+      <p class="intro">Schrijf een klein verhaaltje of dagboekje en gebruik alle woorden hieronder. Zelf zinnen maken is de sterkste vorm van onthouden.</p>
+      <div class="targets" id="targets"></div>
+      <textarea id="schrijfTxt" placeholder="Vandaag …" autocorrect="off" autocapitalize="sentences"></textarea>
+      <div class="btnrow">
+        <button class="b-good" id="btnSaveEntry">Opslaan</button>
+        <button class="b-easy" id="btnAiCheck">AI-controle</button>
+      </div>
+      <div class="btnrow" style="margin-top:8px">
+        <button style="background:#EEF2FA;color:var(--blue)" id="btnCopyPrompt">Kopieer controle-prompt</button>
+        <button style="background:#EEF2FA;color:var(--blue)" id="btnNewTargets">Andere woorden</button>
+      </div>
+      <div class="airesult" id="aiResult"></div>
+    </div>
+    <div class="journal" id="journal"></div>
+  </section>
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script src="./data.js"></script>
+<script src="./stories.js"></script>
 <script>
 "use strict";
 /* ================= state & storage ================= */
 const KEY="duizend_v1";
-const DEFAULT={cards:{},days:{},settings:{newPerDay:5,mode:"auto"},newLog:{date:"",count:0}};
+const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:""},newLog:{date:"",count:0},journal:[],lastSchrijf:0};
 let S=load();
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);return Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})})}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Opslaan mislukt")}}
 const byId={};WORDS.forEach(w=>byId[w.i]=w);
 function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function dateStr(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-
-/* ================= SRS (simplified SM-2, cognate-boosted) ================= */
 const DAY=86400000;
+
+/* ================= SRS v2 =================
+   Learning phase: two Good steps (same session, then graduate).
+   Lapses on mature cards halve the interval instead of resetting ("relearn"),
+   which avoids low-interval hell; ease still drops. Cognates graduate with
+   longer first intervals. Returns true when the card leaves this session. */
 function schedule(c,grade,isCognate){
-  if(grade==="again"){c.ef=Math.max(1.3,(c.ef||2.5)-0.2);c.r=0;c.iv=0;return false}
   c.ef=c.ef||2.5;
-  if(grade==="good"){
-    c.iv=c.iv?Math.round(c.iv*c.ef):(isCognate?2:1);
-  }else{ // easy
-    c.iv=c.iv?Math.round(c.iv*c.ef*1.35):(isCognate?4:2);
-    c.ef=Math.min(3.0,c.ef+0.05);
+  if(grade==="again"){
+    c.ef=Math.max(1.3,c.ef-0.2);
+    if(c.iv>=1){ // mature lapse: relearn with halved interval
+      c.iv=Math.max(1,Math.round(c.iv*0.5));
+      c.due=Date.now()+c.iv*DAY;
+      return true;
+    }
+    c.step=0;return false; // learning card: requeue this session
   }
-  c.r=(c.r||0)+1;
-  c.due=Date.now()+c.iv*DAY;
+  if(!c.iv){ // learning phase
+    if(grade==="good"){
+      c.step=(c.step||0)+1;
+      if(c.step<2)return false;      // step 1: re-show later this session
+      c.iv=isCognate?2:1;            // step 2: graduate
+    }else{ c.iv=isCognate?4:2 }      // easy: graduate immediately
+    c.r=(c.r||0)+1;c.due=Date.now()+c.iv*DAY;return true;
+  }
+  // review phase
+  if(grade==="good"){c.iv=Math.round(c.iv*c.ef)}
+  else{c.iv=Math.round(c.iv*c.ef*1.35);c.ef=Math.min(3,c.ef+0.05)}
+  c.r=(c.r||0)+1;c.due=Date.now()+c.iv*DAY;
   return true;
 }
 
@@ -234,27 +340,27 @@ function dueCards(){const now=Date.now();return Object.keys(S.cards).filter(id=>
 function newAllowance(){if(S.newLog.date!==today()){S.newLog={date:today(),count:0}}return Math.max(0,S.settings.newPerDay-S.newLog.count)}
 function unseen(){return WORDS.filter(w=>!S.cards[w.i]).map(w=>w.i)}
 function buildQueue(){
-  const due=dueCards().slice(0,20);
+  const due=dueCards().slice(0,100);
   const fresh=unseen().slice(0,newAllowance());
   const q=[];let d=0,n=0;
-  // interleave: 2 reviews then 1 new
   while(d<due.length||n<fresh.length){
     if(d<due.length)q.push(due[d++]);
     if(d<due.length)q.push(due[d++]);
     if(n<fresh.length)q.push(fresh[n++]);
   }
-  return q.slice(0,25);
+  return q;
 }
+function graduatedIds(){return Object.keys(S.cards).filter(id=>(S.cards[id].r||0)>=1).map(Number)}
 
 /* ================= speech ================= */
 let nlVoice=null;
 function pickVoice(){const vs=speechSynthesis.getVoices();nlVoice=vs.find(v=>v.lang==="nl-NL")||vs.find(v=>v.lang&&v.lang.startsWith("nl"))||null}
 if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
-function speak(txt){
+function speak(txt,rate){
   if(!("speechSynthesis" in window))return toast("Geen audio beschikbaar");
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(txt);
-  u.lang="nl-NL";if(nlVoice)u.voice=nlVoice;u.rate=0.92;
+  u.lang="nl-NL";if(nlVoice)u.voice=nlVoice;u.rate=rate||0.92;
   speechSynthesis.speak(u);
 }
 
@@ -270,10 +376,18 @@ function lev(a,b){
   return prev[n];
 }
 function similarity(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;const d=lev(a,b);return 1-d/Math.max(a.length,b.length)}
+function stripArticle(w){return norm(w).replace(/^(de|het|een)\s+/,"")}
+function textUsesWord(text,target){
+  const toks=(" "+norm(text)+" ").split(" ").filter(Boolean);
+  return stripArticle(target).split(" ").every(t=>{
+    if(t.length<=3)return toks.includes(t);
+    const stem=t.slice(0,Math.max(4,t.length-2));
+    return toks.some(tok=>tok.startsWith(stem));
+  });
+}
 
 /* ================= session flow ================= */
 let queue=[],pos=0,total=0,reviewedOk=0,againSet=new Set();
-
 function startSession(){
   queue=buildQueue();
   if(!queue.length)return;
@@ -283,10 +397,9 @@ function startSession(){
 function currentModeFor(id){
   const c=S.cards[id];
   const reps=c?c.r||0:0;
-  const pref=S.settings.mode;
-  if(!c||reps<2)return "flash";           // new & young cards: recognition
-  if(pref==="flash")return "flash";
-  return "type";                            // auto & type: production for mature
+  if(!c||reps<2)return "flash";
+  if(S.settings.mode==="flash")return "flash";
+  return "type";
 }
 function updateProg(){
   document.getElementById("progBar").style.width=Math.round(100*pos/Math.max(1,total))+"%";
@@ -310,6 +423,7 @@ function renderCard(){
         <p class="gloss">${w.e}</p>
         <p class="sv">🇸🇪 <b>${w.v}</b></p>
         <p class="xen">${w.x}</p>
+        <div class="shadow-tip">🗣 Zeg de zin hardop na — dat traint je uitspraak.<button id="shadowBtn">🐢 Nog eens</button></div>
       </div>
       <div class="spacer"></div>
       <div class="btnrow" id="row1"><button class="b-reveal">Laat zien</button></div>
@@ -323,7 +437,8 @@ function renderCard(){
       document.getElementById("ans").classList.add("show");
       document.getElementById("row1").style.display="none";
       document.getElementById("row2").style.display="flex";
-      speak(w.w);
+      speak(w.s);
+      document.getElementById("shadowBtn").onclick=()=>speak(w.s,0.7);
     };
     K.querySelector(".b-again").onclick=()=>grade(id,"again");
     K.querySelector(".b-good").onclick=()=>grade(id,"good");
@@ -346,9 +461,7 @@ function renderCard(){
     const inp=K.querySelector("#typeIn");
     setTimeout(()=>inp.focus(),50);
     const check=()=>{
-      const simFull=similarity(inp.value,w.s);
-      const simWord=similarity(inp.value,w.w);
-      const sim=Math.max(simFull,simWord);
+      const sim=Math.max(similarity(inp.value,w.s),similarity(inp.value,w.w));
       const fb=document.getElementById("fb");
       document.getElementById("rowCheck").style.display="none";
       document.getElementById("rowNext").style.display="flex";
@@ -378,16 +491,16 @@ function renderCard(){
 function grade(id,g){
   const w=byId[id];
   if(!S.cards[id]){
-    S.cards[id]={r:0,iv:0,ef:2.5,due:0};
+    S.cards[id]={r:0,iv:0,ef:2.5,due:0,step:0};
     S.newLog.count++;
   }
-  const scheduled=schedule(S.cards[id],g,!!w.c);
-  if(scheduled){reviewedOk++}
+  const done=schedule(S.cards[id],g,!!w.c);
+  if(done){reviewedOk++}
   else{
-    // requeue a few positions later, once flagged in this session
-    const insertAt=Math.min(queue.length,pos+4);
+    const insertAt=Math.min(queue.length,pos+5);
     queue.splice(insertAt,0,id);
     if(!againSet.has(id)){total++;againSet.add(id)}
+    else if(g==="good"){total++}
   }
   pos++;save();renderCard();
 }
@@ -398,15 +511,145 @@ function finishSession(){
   show("scr-done");
 }
 
+/* ================= Lezen ================= */
+function renderLezen(){
+  const n=Object.keys(S.cards).length;
+  const list=document.getElementById("storyList");list.innerHTML="";
+  STORIES.forEach((st,idx)=>{
+    const open=n>=st.m;
+    const b=document.createElement("button");
+    b.className="story-item"+(open?"":" locked");
+    b.innerHTML=`<div><h3>${st.t}</h3><span>${open?"~"+st.txt.split(" ").length+" woorden":"Ontgrendel bij "+st.m+" gestarte woorden ("+n+"/"+st.m+")"}</span></div><span class="lock">${open?"→":"🔒"}</span>`;
+    if(open)b.onclick=()=>openReader(idx);
+    list.appendChild(b);
+  });
+}
+let curStory=null;
+function openReader(idx){
+  curStory=STORIES[idx];
+  document.getElementById("rTitle").textContent=curStory.t;
+  const box=document.getElementById("rTxt");box.innerHTML="";
+  curStory.txt.split(" ").forEach(tok=>{
+    const sp=document.createElement("span");sp.className="w";sp.textContent=tok+" ";
+    sp.onclick=()=>showGloss(tok);
+    box.appendChild(sp);
+  });
+  document.getElementById("glossBar").classList.remove("show");
+  show("scr-reader");
+}
+function showGloss(tok){
+  const t=norm(tok);if(!t)return;
+  const bar=document.getElementById("glossBar");
+  let g=null;
+  if(curStory.gloss){for(const k in curStory.gloss){if(stripArticle(k)===t||norm(k)===t){g=curStory.gloss[k];break}}}
+  if(!g){
+    const hit=WORDS.find(w=>stripArticle(w.w)===t)
+      ||WORDS.find(w=>stripArticle(w.w).split(" ").includes(t))
+      ||WORDS.find(w=>{const e=stripArticle(w.w);return e.length>=4&&t.startsWith(e)&&t.length-e.length<=3}) // tapped word is inflection of entry (woorden -> woord)
+      ||WORDS.find(w=>{const e=stripArticle(w.w);return t.length>=4&&e.startsWith(t)&&e.length-t.length<=3});  // entry is longer form of tapped word
+    if(hit)g=hit.e+" · 🇸🇪 "+hit.v;
+  }
+  bar.innerHTML=g?`<b>${tok.replace(/[.,!?]/g,"")}</b> — ${g}`:`<b>${tok.replace(/[.,!?]/g,"")}</b> — nog niet in je woordenlijst`;
+  bar.classList.add("show");
+  speak(tok.replace(/[.,!?]/g,""));
+}
+
+/* ================= Schrijven ================= */
+let targetIds=[];
+function pickTargets(){
+  const grads=graduatedIds();
+  const sorted=grads.sort((a,b)=>{
+    const ca=S.cards[a],cb=S.cards[b];
+    return (ca.ef-cb.ef)||(ca.iv-cb.iv);
+  });
+  // weakest cards first (low ease = most lapses), skip ultra-common function words (id<35 heuristic keeps it meaningful)
+  targetIds=sorted.filter(id=>id>35).slice(0,7);
+  if(targetIds.length<7)targetIds=sorted.slice(0,7);
+}
+function renderSchrijf(keepText){
+  const grads=graduatedIds();
+  const box=document.getElementById("targets");
+  if(grads.length<15){
+    box.innerHTML='<span class="target">Leer eerst ±15 woorden, dan kun je gaan schrijven.</span>';
+    document.getElementById("schrijfTxt").disabled=true;
+  }else{
+    document.getElementById("schrijfTxt").disabled=false;
+    if(!targetIds.length)pickTargets();
+    updateTargets();
+  }
+  if(!keepText){document.getElementById("schrijfTxt").value="";document.getElementById("aiResult").classList.remove("show")}
+  renderJournal();
+}
+function updateTargets(){
+  const text=document.getElementById("schrijfTxt").value;
+  const box=document.getElementById("targets");box.innerHTML="";
+  targetIds.forEach(id=>{
+    const w=byId[id];
+    const used=text&&textUsesWord(text,w.w);
+    const sp=document.createElement("span");
+    sp.className="target"+(used?" used":"");
+    sp.textContent=w.w;
+    sp.onclick=()=>speak(w.w);
+    box.appendChild(sp);
+  });
+}
+function saveEntry(){
+  const text=document.getElementById("schrijfTxt").value.trim();
+  if(text.split(/\s+/).length<10)return toast("Schrijf minstens 10 woorden");
+  const used=targetIds.filter(id=>textUsesWord(text,byId[id].w));
+  used.forEach(id=>{const c=S.cards[id];if(c&&c.iv>=1){schedule(c,"good",!!byId[id].c)}});
+  S.journal.unshift({d:today(),text,words:targetIds.map(id=>byId[id].w),used:used.length});
+  S.journal=S.journal.slice(0,60);
+  S.lastSchrijf=Date.now();
+  S.days[today()]=true;
+  save();
+  toast(`Opgeslagen — ${used.length}/${targetIds.length} woorden gebruikt ✓`);
+  targetIds=[];renderSchrijf();
+}
+const AI_PROMPT=`You are a friendly Dutch teacher. A Swedish learner living in Amsterdam wrote this short Dutch text. 1) Give a corrected version. 2) List the 2-4 most important corrections with a one-line explanation each (in English). 3) End with one short encouragement in Dutch. Keep it concise. Text:\n\n`;
+async function aiCheck(){
+  const text=document.getElementById("schrijfTxt").value.trim();
+  if(!text)return toast("Schrijf eerst iets");
+  const key=(S.settings.apiKey||"").trim();
+  const out=document.getElementById("aiResult");
+  if(!key){out.textContent="Geen API-sleutel ingesteld. Voeg er één toe bij Instellingen, of gebruik 'Kopieer controle-prompt' en plak die in een AI-app.";out.classList.add("show");return}
+  out.textContent="Bezig met controleren…";out.classList.add("show");
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:700,messages:[{role:"user",content:AI_PROMPT+text}]})
+    });
+    if(!res.ok)throw new Error("API "+res.status);
+    const data=await res.json();
+    out.textContent=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n")||"Geen antwoord ontvangen.";
+  }catch(e){
+    out.textContent="Controle mislukt ("+e.message+"). Controleer je sleutel en internetverbinding, of gebruik de kopieer-knop.";
+  }
+}
+function copyPrompt(){
+  const text=document.getElementById("schrijfTxt").value.trim();
+  if(!text)return toast("Schrijf eerst iets");
+  const full=AI_PROMPT+text;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(full).then(()=>toast("Gekopieerd — plak in een AI-app")).catch(()=>toast("Kopiëren mislukt"));
+  }else toast("Kopiëren niet beschikbaar");
+}
+function renderJournal(){
+  const j=document.getElementById("journal");
+  if(!S.journal.length){j.innerHTML="";return}
+  j.innerHTML="<h3>Jouw dagboek</h3>"+S.journal.map(e=>
+    `<div class="jentry"><div class="jdate">${e.d} · ${e.used}/${e.words.length} doelwoorden</div>${e.text.replace(/</g,"&lt;")}</div>`).join("");
+}
+
 /* ================= home rendering ================= */
-const GABLES=[ // four Amsterdam gable silhouettes (viewBox 0 0 50 40)
-  "M25 2 L40 14 L40 40 L10 40 L10 14 Z",                                   // spout
-  "M10 40 L10 16 L15 16 L15 10 L20 10 L20 5 L30 5 L30 10 L35 10 L35 16 L40 16 L40 40 Z", // step
-  "M10 40 L10 18 C10 8 18 4 25 4 C32 4 40 8 40 18 L40 40 Z",               // bell
-  "M10 40 L10 14 L18 14 L18 6 L32 6 L32 14 L40 14 L40 40 Z"                // neck
+const GABLES=[
+  "M25 2 L40 14 L40 40 L10 40 L10 14 Z",
+  "M10 40 L10 16 L15 16 L15 10 L20 10 L20 5 L30 5 L30 10 L35 10 L35 16 L40 16 L40 40 Z",
+  "M10 40 L10 18 C10 8 18 4 25 4 C32 4 40 8 40 18 L40 40 Z",
+  "M10 40 L10 14 L18 14 L18 6 L32 6 L32 14 L40 14 L40 40 Z"
 ];
 function renderHome(){
-  // streak houses: trailing 7 days
   const row=document.getElementById("gevelRow");row.innerHTML="";
   const now=new Date();
   const dayNames=["zo","ma","di","wo","do","vr","za"];
@@ -424,28 +667,47 @@ function renderHome(){
     row.appendChild(div);
   }
   const due=dueCards().length,fresh=Math.min(newAllowance(),unseen().length);
-  document.getElementById("stLearned").textContent=Object.keys(S.cards).length;
+  const started=Object.keys(S.cards).length;
+  document.getElementById("stLearned").textContent=started;
   document.getElementById("stDue").textContent=due;
   document.getElementById("stStreak").textContent=streak;
   const btn=document.getElementById("btnStart");
   const note=document.getElementById("sessNote");
   if(due+fresh===0){btn.disabled=true;note.textContent="Alles klaar voor vandaag — tot morgen! 🌷"}
   else{btn.disabled=false;note.textContent=`${due} te herhalen · ${fresh} nieuw${fresh===1?"":"e"} — ± ${Math.max(1,Math.round((due+fresh)*0.3))} min`}
-  // settings UI
+  const open=STORIES.filter(st=>started>=st.m).length;
+  document.getElementById("lezenNote").textContent=open+"/"+STORIES.length+" verhalen";
+  const grads=graduatedIds().length;
+  document.getElementById("schrijfNote").textContent=S.journal.length?S.journal.length+" stukjes":"zelf zinnen maken";
+  document.getElementById("schrijfBadge").style.display=(grads>=15&&Date.now()-S.lastSchrijf>6*DAY)?"block":"none";
   document.querySelectorAll("#segNew button").forEach(b=>b.classList.toggle("on",+b.dataset.v===S.settings.newPerDay));
   document.querySelectorAll("#segMode button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.settings.mode));
+  document.getElementById("apiKeyIn").value=S.settings.apiKey||"";
 }
 
 /* ================= navigation & misc ================= */
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");if(id==="scr-home")renderHome()}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");if(id==="scr-home")renderHome();if(id==="scr-lezen")renderLezen();if(id==="scr-schrijf")renderSchrijf()}
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
 
 document.getElementById("btnStart").onclick=startSession;
 document.getElementById("btnQuit").onclick=()=>{if(reviewedOk>0){S.days[today()]=true;save()}show("scr-home")};
 document.getElementById("btnHome").onclick=()=>show("scr-home");
+document.getElementById("btnLezen").onclick=()=>show("scr-lezen");
+document.getElementById("btnSchrijf").onclick=()=>show("scr-schrijf");
+document.getElementById("btnReaderBack").onclick=()=>{speechSynthesis.cancel();show("scr-lezen")};
+document.querySelectorAll(".backbtn").forEach(b=>b.onclick=()=>show("scr-home"));
+document.getElementById("rPlay").onclick=()=>speak(curStory.txt,0.92);
+document.getElementById("rPlaySlow").onclick=()=>speak(curStory.txt,0.7);
+document.getElementById("rStop").onclick=()=>speechSynthesis.cancel();
+document.getElementById("btnSaveEntry").onclick=saveEntry;
+document.getElementById("btnAiCheck").onclick=aiCheck;
+document.getElementById("btnCopyPrompt").onclick=copyPrompt;
+document.getElementById("btnNewTargets").onclick=()=>{targetIds=[];pickTargets();updateTargets();toast("Nieuwe woorden gekozen")};
+document.getElementById("schrijfTxt").addEventListener("input",()=>updateTargets());
 document.getElementById("btnSettings").onclick=()=>document.getElementById("settingsPanel").classList.toggle("open");
 document.querySelectorAll("#segNew button").forEach(b=>b.onclick=()=>{S.settings.newPerDay=+b.dataset.v;save();renderHome()});
 document.querySelectorAll("#segMode button").forEach(b=>b.onclick=()=>{S.settings.mode=b.dataset.v;save();renderHome()});
+document.getElementById("apiKeyIn").addEventListener("change",e=>{S.settings.apiKey=e.target.value.trim();save();toast("Sleutel opgeslagen op dit apparaat")});
 document.getElementById("btnReset").onclick=()=>{if(confirm("Alles wissen? Dit kan niet ongedaan worden gemaakt.")){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast("Gereset")}};
 document.getElementById("btnExport").onclick=()=>{
   const blob=new Blob([JSON.stringify(S)],{type:"application/json"});
@@ -456,7 +718,7 @@ document.getElementById("btnImport").onclick=()=>document.getElementById("import
 document.getElementById("importFile").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=()=>{try{const s=JSON.parse(r.result);if(!s.cards)throw 0;S=Object.assign({},DEFAULT,s);save();renderHome();toast("Voortgang geïmporteerd ✓")}catch(err){toast("Ongeldig bestand")}};
+  r.onload=()=>{try{const s=JSON.parse(r.result);if(!s.cards)throw 0;S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);save();renderHome();toast("Voortgang geïmporteerd ✓")}catch(err){toast("Ongeldig bestand")}};
   r.readAsText(f);e.target.value="";
 };
 

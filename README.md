@@ -1,50 +1,57 @@
 # Duizend — jouw eerste 1000 woorden Nederlands
 
-A tiny offline-first Dutch learning app built for micro-sessions (5–10 min/day).
-Spaced repetition, typo-tolerant sentence typing, Dutch audio, Swedish cognate
-boosting, and a canal-house streak tracker.
+Offline-first Dutch learning app: spaced repetition, sentence typing, graded
+reading, free writing with AI/partner correction, shadowing, Dutch audio,
+Swedish cognate boosting, and a canal-house streak tracker.
 
-## Deploy to GitHub Pages (3 steps)
+## Update an existing deployment
 
-1. **Create a repo** on github.com (e.g. `duizend`), public.
-2. **Upload these files** (drag & drop on the repo page → "uploading an existing file"):
-   `index.html`, `data.js`, `manifest.json`, `sw.js`, `icon-180.png`, `icon-512.png`
-3. **Enable Pages**: repo → Settings → Pages → Source: "Deploy from a branch" →
-   Branch: `main`, folder `/ (root)` → Save.
+Replace `index.html`, `stories.js` (new file), `data.js` and `sw.js` in your
+repo. The cache name is bumped to `duizend-v4` so phones pick up the update
+automatically. Your progress (localStorage) is untouched.
 
-After ~1 minute your app is live at `https://<your-username>.github.io/duizend/`
+## First deployment (3 steps)
 
-## Install on iPhone
+1. Create a public repo on github.com (e.g. `duizend`).
+2. Upload: `index.html`, `data.js`, `stories.js`, `manifest.json`, `sw.js`,
+   `icon-180.png`, `icon-512.png`.
+3. Settings → Pages → Deploy from branch `main`, folder `/ (root)`.
+Then on iPhone: open the URL in Safari → Share → **Add to Home Screen**.
 
-Open the URL in **Safari** → tap the Share button → **Add to Home Screen**.
-It launches full-screen like a native app and works offline after the first visit.
+## The learning system (research notes)
 
-## How it works
-
-- **Session** = due reviews + up to 5 new words (configurable: 3/5/8), capped at ~7 min.
-- **New/young words**: flashcards (recognition). **Mature words**: you type the Dutch
-  sentence from the English prompt — grading is fuzzy, so word order and small typos
-  aren't punished. Grammar perfection is not the goal; communication is.
-- **≈ Zweeds** tag = Swedish cognate. These get longer initial intervals since
-  they're nearly free for you.
-- **Streak** = one canal house per day on the home screen.
-- **Audio**: tap 🔊 (uses the iPhone's built-in Dutch voice, offline).
+- **Sessions (SRS)**: due reviews + new words. New words now use *learning
+  steps*: you see each one twice in its first session before it graduates —
+  the biggest early-retention win known from the Anki/FSRS community.
+  Lapses on mature words *halve* the interval instead of resetting it,
+  avoiding "low-interval hell".
+- **New words/day**: 5 / 8 / 15 / 20. Research (e.g. Nakata 2015) shows
+  diminishing returns above ~20/session; at 20/day expect ~30-40 min of
+  daily reviews at steady state, and the full 1000 in ~7 weeks.
+- **Schrijven**: the app picks your 7 weakest learned words; you write a
+  mini-text using them. Composition with target words tops the retention
+  charts (Involvement Load Hypothesis — Hulstijn & Laufer 2001; Keating
+  2008). Used words get an SRS boost; entries are saved to a journal your
+  partner can correct. A weekly "tijd!" badge nudges you.
+- **AI-controle**: optional. Add an Anthropic API key in Instellingen
+  (stored only on your device) for one-tap correction, or use "Kopieer
+  controle-prompt" to paste your text + a teacher prompt into any AI app.
+  Your partner remains the final judge — that's the pedagogy, not a bug.
+- **Lezen**: 20 graded mini-stories unlock at every 50 words started. Each
+  is written (almost) entirely with vocabulary you've already met, plus a
+  few glossed extras — comprehensible input, "i+1". Tap any word for its
+  meaning; play audio at normal or slow speed for listening practice.
+- **Shadowing**: after each card reveal, say the sentence aloud and replay
+  it slowly to compare. Self-assessed by design — the articulation is the
+  training.
 
 ## Your data
 
-Progress lives in your browser's localStorage on the device. Use **Exporteer**
-regularly to back up, and **Importeer** to restore or move to another device.
-Note: if you delete Safari website data, progress is wiped — keep a backup.
+Progress lives in localStorage. **Exporteer** regularly; **Importeer**
+restores. Clearing Safari website data wipes progress — keep backups.
 
-## Editing the word list
+## Editing content
 
-`data.js` is plain text. Each line is one item:
-
-```
-{i:301, w:"dutch word", s:"Dutch sentence.", e:"english gloss",
- v:"swedish gloss", x:"English sentence.", t:"core|life|fam", c:0 or 1},
-```
-
-Add lines before the final `];` with unique `i` numbers. Your boyfriend is the
-naturalness QA department. After editing, bump the cache name in `sw.js`
-(`duizend-v1` → `duizend-v2`) so phones pick up the change.
+- Words: `data.js`, one item per line, unique `i`, before the final `];`.
+- Stories: `stories.js` — `m` is the unlock milestone (words started).
+- After any edit, bump the cache name in `sw.js` (v4 → v5).

@@ -80,10 +80,34 @@ Per-profile config also covers:
   highest cognate rate of the four tracks so far), separate from Dutch,
   Swedish, and Spanish's own counts.
 
-## The learning system (unchanged mechanics, research notes)
+## The learning system (research notes)
 
-- SRS with learning steps (each new word seen twice before graduating);
-  mature lapses halve the interval instead of resetting.
+- **FSRS-6 scheduler** (upgraded from SM-2-style): the modern
+  spaced-repetition algorithm with default parameters trained on ~700M
+  real reviews, as adopted by Anki. Benchmarks show ~20-30% fewer
+  reviews for the same retention. Existing progress migrates
+  automatically and losslessly (stability := old interval, difficulty
+  derived from ease factor). A **target retention** setting (85/90/95%)
+  controls the workload/retention trade-off.
+- Learning steps preserved: each new word is seen twice before
+  graduating; lapses reschedule via the FSRS forget-stability formula.
+- **Four exercise types**, interleaved automatically (research:
+  interleaving beats blocking): flashcards, type-the-sentence,
+  **dictation** (hear → transcribe; aural vocabulary knowledge predicts
+  ~52% of listening-comprehension variance), and **cloze** (fill the
+  blanked word in its sentence). Each is also selectable as a fixed
+  mode in Settings.
+- **Spreken / Speak**: pronunciation practice on your 8 soonest-due
+  sentences using the browser's speech recognition (meta-analyses show
+  ASR practice is moderately effective with a large effect on segmental
+  pronunciation). Falls back to self-judged shadowing where speech
+  recognition isn't available. Correct sentences count as retrieval and
+  feed the scheduler.
+- **Sprint**: 60-second fluency rounds on well-known words only —
+  Nation's "fluency development" strand (the most neglected of his four
+  strands): no new language, just speed pressure to build automaticity.
+  Tracks your personal best; deliberately does not touch the SRS.
+- Mature lapses reschedule rather than reset.
 - 5/8/15/20 new words per day (research: diminishing returns above ~20).
 - **Schrijven / Write**: app picks your 7 weakest learned words; write a
   mini-text using them; AI-check via API key (Settings) or copy-paste
@@ -116,4 +140,4 @@ backup file belongs to a different profile.
   they need extending, and check for collisions against existing
   vocabulary first — same pattern used for Spanish and French. No other
   code changes needed.
-- After any edit, bump the cache name in `sw.js` (v8 → v9).
+- After any edit, bump the cache name in `sw.js` (v10 → v11).

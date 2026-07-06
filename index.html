@@ -63,7 +63,26 @@ main{padding:20px 20px 40px}
 .startbtn:active{transform:translateY(2px);border-bottom-width:2px}
 .startbtn[disabled]{opacity:.5}
 .subnote{text-align:center;font-size:13px;color:var(--muted);margin-top:10px}
-.moderow{display:flex;gap:10px;margin-top:14px}
+.moderow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.speak-card{background:#fff;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 2px 10px rgba(0,48,130,.06)}
+.speak-card .target-zin{font-size:20px;font-weight:700;color:var(--blue-deep);margin:10px 0 4px}
+.speak-card .en-prompt{color:var(--muted);font-size:14px}
+.micbtn{width:100%;margin-top:14px;background:var(--blue);color:#fff;border-radius:12px;padding:16px;font-size:17px;font-weight:700}
+.micbtn.rec{background:var(--err);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
+.speak-fb{margin-top:12px;border-radius:10px;padding:12px;font-size:15px;display:none}
+.speak-fb.show{display:block}
+.speak-fb.ok{background:#E7F6EC;color:#0B6B2E}
+.speak-fb.no{background:#FDEBEC;color:#B3261E}
+.sprint-area{margin-top:14px}
+.sprint-timer{height:8px;background:#E6ECF6;border-radius:4px;overflow:hidden;margin-bottom:14px}
+.sprint-timer i{display:block;height:100%;background:var(--yellow);width:100%;transition:width .25s linear}
+.sprint-q{background:#fff;border-radius:16px;padding:20px;text-align:center;font-size:24px;font-weight:800;color:var(--blue-deep);box-shadow:0 2px 10px rgba(0,48,130,.06)}
+.sprint-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.sprint-opts button{background:#fff;border:2px solid #E6ECF6;border-radius:12px;padding:16px 10px;font-size:16px;font-weight:600;color:var(--ink)}
+.sprint-opts button.ok{border-color:#0B6B2E;background:#E7F6EC}
+.sprint-opts button.no{border-color:#B3261E;background:#FDEBEC}
+.sprint-score{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:8px;font-variant:tabular-nums}
 .modebtn{flex:1;background:var(--blue);color:#fff;border-radius:14px;padding:14px 8px;font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;border-bottom:4px solid var(--blue-deep);position:relative}
 .modebtn small{display:block;font-family:var(--body);font-weight:400;font-size:11px;text-transform:none;letter-spacing:0;opacity:.8;margin-top:3px}
 .modebtn:active{transform:translateY(2px);border-bottom-width:2px}
@@ -195,6 +214,8 @@ main{padding:20px 20px 40px}
     <div class="moderow">
       <button class="modebtn" id="btnLezen"><span id="lezenLabel"></span><small id="lezenNote"></small></button>
       <button class="modebtn" id="btnSchrijf"><span id="schrijfLabel"></span><small id="schrijfNote"></small><span class="badge" id="schrijfBadge" style="display:none"></span></button>
+      <button class="modebtn" id="btnSpreek"><span id="spreekLabel"></span><small id="spreekNote"></small></button>
+      <button class="modebtn" id="btnSprint"><span id="sprintLabel"></span><small id="sprintNote"></small></button>
     </div>
     <div class="homelinks">
       <button id="btnSettings"></button>
@@ -212,7 +233,13 @@ main{padding:20px 20px 40px}
       <div class="setrow">
         <label id="lblMode"></label>
         <div class="seg" id="segMode">
-          <button data-v="auto" id="modeAuto"></button><button data-v="flash" id="modeFlash"></button><button data-v="type" id="modeType"></button>
+          <button data-v="auto" id="modeAuto"></button><button data-v="flash" id="modeFlash"></button><button data-v="type" id="modeType"></button><button data-v="cloze" id="modeCloze"></button><button data-v="listen" id="modeListen"></button>
+        </div>
+      </div>
+      <div class="setrow">
+        <label id="lblRetention"></label>
+        <div class="seg" id="segRet">
+          <button data-v="0.85">85%</button><button data-v="0.9">90%</button><button data-v="0.95">95%</button>
         </div>
       </div>
       <div class="setrow">
@@ -290,6 +317,26 @@ main{padding:20px 20px 40px}
     </div>
     <div class="journal" id="journal"></div>
   </section>
+
+  <!-- SPREKEN / SPEAK -->
+  <section class="screen" id="scr-spreek">
+    <div class="backrow"><button class="backbtn"></button></div>
+    <div class="schrijf">
+      <h2 id="spreekTitle"></h2>
+      <p class="intro" id="spreekIntro"></p>
+      <div class="speak-card" id="speakCard"></div>
+    </div>
+  </section>
+
+  <!-- SPRINT -->
+  <section class="screen" id="scr-sprint">
+    <div class="backrow"><button class="backbtn"></button></div>
+    <div class="schrijf">
+      <h2 id="sprintTitle"></h2>
+      <p class="intro" id="sprintIntro"></p>
+      <div class="sprint-area" id="sprintArea"></div>
+    </div>
+  </section>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -351,6 +398,22 @@ const UI_STRINGS={
     noAudio:"Geen audio beschikbaar",
     doneStatsTemplate:(done,started,total)=>done+" "+"kaarten afgerond"+" · "+started+" "+"van de"+" "+total+" "+"woorden gestart",
     goodFeedback:"Goed! ✓",closeFeedbackPrefix:"Bijna! Het juiste antwoord:",wrongFeedbackPrefix:"Het juiste antwoord:",
+    modeCloze:"Invullen",modeListen:"Luisteren",retentionLabel:"Doelretentie (FSRS)",
+    listenTag:"Luister en typ wat je hoort",clozeTag:"Vul het ontbrekende woord in",
+    listenPlaceholder:"Typ wat je hoort…",clozePlaceholder:"Het ontbrekende woord…",
+    spreekLabel:"Spreken",sprintLabel:"Sprint",
+    spreekTitle:"Spreeksessie",spreekIntro:"Lees de zin hardop. De app luistert en controleert je uitspraak.",
+    spreekIntroFallback:"Spraakherkenning is niet beschikbaar in deze browser. Luister, zeg de zin hardop na en beoordeel jezelf.",
+    micStart:"🎤 Spreek de zin",micListening:"Luisteren…",
+    speakHeard:"Gehoord:",speakOk:"Goed uitgesproken! ✓",speakNo:"Nog niet helemaal — probeer nog eens.",
+    speakSelfOk:"✓ Dat lukte",speakSelfNo:"✗ Nog niet",speakNext:"Volgende zin",speakDoneMsg:"Spreeksessie klaar! 🎉",
+    speakLockMsg:"Leer eerst ±15 woorden, dan kun je gaan spreken.",
+    sprintTitle:"Fluency-sprint",sprintIntro:"60 seconden, alleen woorden die je al kent. Hoe snel ben je?",
+    sprintStart:"Start sprint",sprintAgain:"Nog een keer",
+    sprintScoreLabel:"score",sprintBestLabel:"record",sprintTimeLabel:"sec",
+    sprintLockTemplate:(need,have)=>"Ontgrendel met "+need+" goed gekende woorden ("+have+"/"+need+")",
+    sprintResultTemplate:(sc,best)=>"Score: "+sc+(sc>best?" — nieuw record! 🏆":" · record: "+best),
+    phrasesReadyTemplate:(n)=>n+" zinnen klaar",bestTemplate:(n)=>"record: "+n,
   },
   en:{
     lezenLabel:"Read",schrijfLabel:"Write",schrijfBadgeText:"time!",
@@ -397,6 +460,22 @@ const UI_STRINGS={
     noAudio:"Audio unavailable",
     doneStatsTemplate:(done,started,total)=>done+" cards completed · "+started+" of "+total+" words started",
     goodFeedback:"Correct! ✓",closeFeedbackPrefix:"Almost! The correct answer:",wrongFeedbackPrefix:"The correct answer:",
+    modeCloze:"Cloze",modeListen:"Listen",retentionLabel:"Target retention (FSRS)",
+    listenTag:"Listen and type what you hear",clozeTag:"Fill in the missing word",
+    listenPlaceholder:"Type what you hear…",clozePlaceholder:"The missing word…",
+    spreekLabel:"Speak",sprintLabel:"Sprint",
+    spreekTitle:"Speaking session",spreekIntro:"Read the sentence out loud. The app listens and checks your pronunciation.",
+    spreekIntroFallback:"Speech recognition is not available in this browser. Listen, say the sentence out loud, and judge yourself.",
+    micStart:"🎤 Speak the sentence",micListening:"Listening…",
+    speakHeard:"Heard:",speakOk:"Well pronounced! ✓",speakNo:"Not quite — try once more.",
+    speakSelfOk:"✓ Got it",speakSelfNo:"✗ Not yet",speakNext:"Next sentence",speakDoneMsg:"Speaking session done! 🎉",
+    speakLockMsg:"Learn about 15 words first, then you can start speaking.",
+    sprintTitle:"Fluency sprint",sprintIntro:"60 seconds, only words you already know. How fast are you?",
+    sprintStart:"Start sprint",sprintAgain:"One more round",
+    sprintScoreLabel:"score",sprintBestLabel:"best",sprintTimeLabel:"sec",
+    sprintLockTemplate:(need,have)=>"Unlocks with "+need+" well-known words ("+have+"/"+need+")",
+    sprintResultTemplate:(sc,best)=>"Score: "+sc+(sc>best?" — new best! 🏆":" · best: "+best),
+    phrasesReadyTemplate:(n)=>n+" sentences ready",bestTemplate:(n)=>"best: "+n,
   }
 };
 function T(){return UI_STRINGS[PROFILE.uiLocale]}
@@ -442,8 +521,8 @@ const PROFILE_ORDER=["nl","sv","es","fr"];
 var activeId=localStorage.getItem("duizend_active_profile")||"nl";
 if(!PROFILES[activeId])activeId="nl";
 var PROFILE,WORDS,STORIES,byId,S;
-const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:""},newLog:{date:"",count:0},journal:[],lastSchrijf:0};
-function loadState(key){try{const raw=localStorage.getItem(key);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
+const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:"",retention:0.9},newLog:{date:"",count:0},journal:[],lastSchrijf:0,sprintBest:0};
+function loadState(key){try{const raw=localStorage.getItem(key);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;if(![0.85,0.9,0.95].includes(m.settings.retention))m.settings.retention=0.9;migrateCards(m.cards);return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
 function save(){try{localStorage.setItem(PROFILE.storageKey,JSON.stringify(S))}catch(e){toast(T().savingFailed)}}
 function renderTabs(){
   const row=document.getElementById("profileTabs");row.innerHTML="";
@@ -468,6 +547,11 @@ function applyUiStrings(){
   document.getElementById("modeAuto").textContent=t.modeMix;
   document.getElementById("modeFlash").textContent=t.modeCards;
   document.getElementById("modeType").textContent=t.modeType;
+  document.getElementById("modeCloze").textContent=t.modeCloze;
+  document.getElementById("modeListen").textContent=t.modeListen;
+  document.getElementById("lblRetention").textContent=t.retentionLabel;
+  document.getElementById("spreekLabel").textContent=t.spreekLabel;
+  document.getElementById("sprintLabel").textContent=t.sprintLabel;
   document.getElementById("lblApiKey").textContent=t.apiKeyLabel;
   document.getElementById("apiKeyHint").textContent=t.apiKeyHint;
   document.getElementById("lblResetAll").textContent=t.resetLabel;
@@ -513,30 +597,74 @@ const DAY=86400000;
    Lapses on mature cards halve the interval instead of resetting ("relearn"),
    which avoids low-interval hell; ease still drops. Cognates graduate with
    longer first intervals. Returns true when the card leaves this session. */
-function schedule(c,grade,isCognate){
-  c.ef=c.ef||2.5;
-  if(grade==="again"){
-    c.ef=Math.max(1.3,c.ef-0.2);
-    if(c.iv>=1){ // mature lapse: relearn with halved interval
-      c.iv=Math.max(1,Math.round(c.iv*0.5));
-      c.due=Date.now()+c.iv*DAY;
-      return true;
-    }
-    c.step=0;return false; // learning card: requeue this session
+/* ================= FSRS-6 scheduler =================
+   Default parameters from open-spaced-repetition/py-fsrs (trained on ~700M Anki reviews).
+   Card state: st=stability(days), df=difficulty(1-10), due(ms), lr=last review(ms), r=reps, step=learning step.
+   Grades: again=1, good=3, easy=4 (Hard unused in our 3-button UI). */
+const FSRS_W=[0.212,1.2931,2.3065,8.2956,6.4133,0.8334,3.0194,0.001,1.8722,0.1666,0.796,1.4835,0.0614,0.2629,1.6483,0.6014,1.8729,0.5425,0.0912,0.0658,0.1542];
+const FSRS_DECAY=-FSRS_W[20];
+const FSRS_FACTOR=Math.pow(0.9,1/FSRS_DECAY)-1;
+function clampNum(x,lo,hi){return Math.min(hi,Math.max(lo,x))}
+function fsrsRetr(elapsedDays,st){return Math.pow(1+FSRS_FACTOR*Math.max(0,elapsedDays)/Math.max(0.001,st),FSRS_DECAY)}
+function fsrsInterval(st){
+  const target=S.settings.retention||0.9;
+  return Math.max(1,Math.round(st/FSRS_FACTOR*(Math.pow(target,1/FSRS_DECAY)-1)));
+}
+function fsrsD0(g,clamp){const d=FSRS_W[4]-Math.exp(FSRS_W[5]*(g-1))+1;return clamp===false?d:clampNum(d,1,10)}
+function fsrsNextD(d,g){
+  const delta=-(FSRS_W[6]*(g-3));
+  const damped=d+(10-d)*delta/9;
+  return clampNum(FSRS_W[7]*fsrsD0(4,false)+(1-FSRS_W[7])*damped,1,10);
+}
+function fsrsNextS(d,st,retr,g){
+  let ns;
+  if(g===1){
+    const lt=FSRS_W[11]*Math.pow(d,-FSRS_W[12])*(Math.pow(st+1,FSRS_W[13])-1)*Math.exp((1-retr)*FSRS_W[14]);
+    const stt=st/Math.exp(FSRS_W[17]*FSRS_W[18]);
+    ns=Math.min(lt,stt);
+  }else{
+    const hard=g===2?FSRS_W[15]:1, easy=g===4?FSRS_W[16]:1;
+    ns=st*(1+Math.exp(FSRS_W[8])*(11-d)*Math.pow(st,-FSRS_W[9])*(Math.exp((1-retr)*FSRS_W[10])-1)*hard*easy);
   }
-  if(!c.iv){ // learning phase
-    if(grade==="good"){
+  return clampNum(ns,0.001,36500);
+}
+// Migrate pre-FSRS cards ({iv,ef}) to FSRS state. Graduated: stability := old interval,
+// difficulty mapped from ease factor (ef 2.5 -> df 5; ef 1.3 -> df ~8.6). Learning cards stay stateless.
+function migrateCards(cards){
+  for(const k in cards){
+    const c=cards[k];
+    if(c.st==null&&(c.iv!=null||c.ef!=null)){
+      if((c.iv||0)>=1){
+        c.st=c.iv;
+        c.df=clampNum(5+((2.5-(c.ef||2.5))*3),1,10);
+        c.lr=c.due-(c.iv*DAY);
+      }
+      delete c.iv;delete c.ef;
+    }
+  }
+  return cards;
+}
+function schedule(c,grade,isCognate){
+  const g=grade==="again"?1:grade==="easy"?4:3;
+  const now=Date.now();
+  if(c.st==null){ // learning phase (same steps as before: 'good' twice, 'easy' skips)
+    if(g===1){c.step=0;return false}
+    if(g===3){
       c.step=(c.step||0)+1;
-      if(c.step<2)return false;      // step 1: re-show later this session
-      c.iv=isCognate?2:1;            // step 2: graduate
-    }else{ c.iv=isCognate?4:2 }      // easy: graduate immediately
-    c.r=(c.r||0)+1;c.due=Date.now()+c.iv*DAY;return true;
+      if(c.step<2)return false;
+    }
+    c.st=FSRS_W[g-1]*(isCognate?1.3:1); // initial stability, cognate boost preserves prior design
+    c.df=fsrsD0(g);
+    c.r=(c.r||0)+1;c.lr=now;c.due=now+fsrsInterval(c.st)*DAY;
+    return true;
   }
   // review phase
-  if(grade==="good"){c.iv=Math.round(c.iv*c.ef)}
-  else{c.iv=Math.round(c.iv*c.ef*1.35);c.ef=Math.min(3,c.ef+0.05)}
-  c.r=(c.r||0)+1;c.due=Date.now()+c.iv*DAY;
-  return true;
+  const elapsed=Math.max(0.01,(now-(c.lr!=null?c.lr:c.due-c.st*DAY))/DAY);
+  const retr=fsrsRetr(elapsed,c.st);
+  c.st=fsrsNextS(c.df!=null?c.df:5,c.st,retr,g);
+  c.df=fsrsNextD(c.df!=null?c.df:5,g);
+  c.r=(c.r||0)+1;c.lr=now;c.due=now+fsrsInterval(c.st)*DAY;
+  return true; // mature lapses reschedule (FSRS forget-stability), matching prior behavior
 }
 
 /* ================= queue building ================= */
@@ -608,12 +736,37 @@ function startSession(){
   pos=0;total=queue.length;reviewedOk=0;againSet=new Set();
   show("scr-sess");renderCard();
 }
+// Find the token in the example sentence matching the headword (handles inflections via prefix), for cloze blanking.
+function clozeFor(w){
+  const alt=w.w.replace(/\(.*?\)/g,"").split("/").map(s=>stripArticle(s.trim()).replace(/^l'/,"")).filter(Boolean);
+  const words=w.s.split(" ");
+  for(let i=0;i<words.length;i++){
+    const tokN=norm(words[i].replace(/^l'/i,""));
+    if(!tokN||tokN.length<2)continue;
+    for(const a of alt){
+      const first=a.split(" ")[0];
+      if(first.length<3)continue;
+      const p=Math.min(4,first.length,tokN.length);
+      if(p>=3&&tokN.slice(0,p)===first.slice(0,p)){
+        const m=words[i].match(/^([¿¡("«']*)(.+?)([.,!?;:")»']*)$/);
+        return {idx:i,words,lead:m?m[1]:"",answer:m?m[2]:words[i],trail:m?m[3]:""};
+      }
+    }
+  }
+  return null;
+}
 function currentModeFor(id){
   const c=S.cards[id];
   const reps=c?c.r||0:0;
   if(!c||reps<2)return "flash";
-  if(S.settings.mode==="flash")return "flash";
-  return "type";
+  const m=S.settings.mode;
+  if(m==="flash"||m==="type"||m==="listen")return m;
+  if(m==="cloze")return clozeFor(byId[id])?"cloze":"type";
+  // auto: deterministic interleave across the four types (research: interleaving > blocking)
+  const pool=["type","flash","listen","cloze"];
+  let pick=pool[(id+reps)%pool.length];
+  if(pick==="cloze"&&!clozeFor(byId[id]))pick="type";
+  return pick;
 }
 function updateProg(){
   document.getElementById("progBar").style.width=Math.round(100*pos/Math.max(1,total))+"%";
@@ -660,6 +813,49 @@ function renderCard(){
     K.querySelector(".b-again").onclick=()=>grade(id,"again");
     K.querySelector(".b-good").onclick=()=>grade(id,"good");
     K.querySelector(".b-easy").onclick=()=>grade(id,"easy");
+  }else if(mode==="listen"){
+    K.innerHTML=`
+      <div class="mode-tag"><span>${t.listenTag}</span>${cog}</div>
+      <div class="btnrow" style="margin-top:14px">
+        <button style="background:#EEF2FA;color:var(--blue)" id="lisPlay">${t.playBtn}</button>
+        <button style="background:#EEF2FA;color:var(--blue)" id="lisSlow">${t.playSlowBtn}</button>
+      </div>
+      <div class="typebox">
+        <input type="text" id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${t.listenPlaceholder}">
+      </div>
+      <div class="feedback" id="fb"></div>
+      <div class="spacer"></div>
+      <div class="btnrow" id="rowCheck"><button class="b-check">${t.checkBtn}</button></div>
+      <div class="btnrow" id="rowNext" style="display:none">
+        <button class="b-again" id="fbAgain" style="display:none">${t.againBtn}</button>
+        <button class="b-good" id="fbNext">${t.nextBtn}</button>
+      </div>`;
+    K.querySelector("#lisPlay").onclick=()=>speak(w.s);
+    K.querySelector("#lisSlow").onclick=()=>speak(w.s,0.65);
+    speak(w.s);
+    const inp=K.querySelector("#typeIn");
+    setTimeout(()=>inp.focus(),50);
+    wireTypedCheck(K,id,w,()=>Math.max(similarity(inp.value,w.s),similarity(inp.value,w.w)),nativeParen,t);
+  }else if(mode==="cloze"){
+    const cz=clozeFor(w);
+    const shown=cz.words.map((tok,i)=>i===cz.idx?cz.lead+"<b style='letter-spacing:2px'>____</b>"+cz.trail:tok).join(" ");
+    K.innerHTML=`
+      <div class="mode-tag"><span>${t.clozeTag}</span>${cog}</div>
+      <p class="zin" style="font-size:19px;color:var(--ink)">${shown}</p>
+      <p class="zin" style="color:var(--muted);font-size:14px">${w.e}${nativeParen} · <b>${hintFor(w.w)}</b></p>
+      <div class="typebox">
+        <input type="text" id="typeIn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${t.clozePlaceholder}">
+      </div>
+      <div class="feedback" id="fb"></div>
+      <div class="spacer"></div>
+      <div class="btnrow" id="rowCheck"><button class="b-check">${t.checkBtn}</button></div>
+      <div class="btnrow" id="rowNext" style="display:none">
+        <button class="b-again" id="fbAgain" style="display:none">${t.againBtn}</button>
+        <button class="b-good" id="fbNext">${t.nextBtn}</button>
+      </div>`;
+    const inp=K.querySelector("#typeIn");
+    setTimeout(()=>inp.focus(),50);
+    wireTypedCheck(K,id,w,()=>Math.max(similarity(inp.value,cz.answer),similarity(inp.value,stripArticle(w.w))),nativeParen,t);
   }else{
     K.innerHTML=`
       <div class="mode-tag"><span>${PROFILE.typeLabel}</span>${cog}</div>
@@ -677,38 +873,43 @@ function renderCard(){
       </div>`;
     const inp=K.querySelector("#typeIn");
     setTimeout(()=>inp.focus(),50);
-    const check=()=>{
-      const sim=Math.max(similarity(inp.value,w.s),similarity(inp.value,w.w));
-      const fb=document.getElementById("fb");
-      document.getElementById("rowCheck").style.display="none";
-      document.getElementById("rowNext").style.display="flex";
-      speak(w.s);
-      if(sim>=0.82){
-        fb.className="feedback show ok";
-        fb.innerHTML=`${t.goodFeedback}<span class="correct-zin">${w.s}</span>`;
-        document.getElementById("fbNext").onclick=()=>grade(id,sim>=0.97?"easy":"good");
-      }else if(sim>=0.55){
-        fb.className="feedback show close";
-        fb.innerHTML=`${t.closeFeedbackPrefix}<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e}${nativeParen})</span>`;
-        document.getElementById("fbAgain").style.display="block";
-        document.getElementById("fbNext").textContent=t.gotItBtn;
-        document.getElementById("fbAgain").onclick=()=>grade(id,"again");
-        document.getElementById("fbNext").onclick=()=>grade(id,"good");
-      }else{
-        fb.className="feedback show no";
-        fb.innerHTML=`${t.wrongFeedbackPrefix}<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e}${nativeParen})</span>`;
-        document.getElementById("fbNext").textContent=t.continueBtn;
-        document.getElementById("fbNext").onclick=()=>grade(id,"again");
-      }
-    };
-    K.querySelector(".b-check").onclick=check;
-    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();if(document.getElementById("rowCheck").style.display!=="none")check()}});
+    wireTypedCheck(K,id,w,()=>Math.max(similarity(inp.value,w.s),similarity(inp.value,w.w)),nativeParen,t);
   }
+}
+// Shared check/feedback wiring for the three typed exercise types.
+function wireTypedCheck(K,id,w,simFn,nativeParen,t){
+  const inp=K.querySelector("#typeIn");
+  const check=()=>{
+    const sim=simFn();
+    const fb=document.getElementById("fb");
+    document.getElementById("rowCheck").style.display="none";
+    document.getElementById("rowNext").style.display="flex";
+    speak(w.s);
+    if(sim>=0.82){
+      fb.className="feedback show ok";
+      fb.innerHTML=`${t.goodFeedback}<span class="correct-zin">${w.s}</span>`;
+      document.getElementById("fbNext").onclick=()=>grade(id,sim>=0.97?"easy":"good");
+    }else if(sim>=0.55){
+      fb.className="feedback show close";
+      fb.innerHTML=`${t.closeFeedbackPrefix}<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e}${nativeParen})</span>`;
+      document.getElementById("fbAgain").style.display="block";
+      document.getElementById("fbNext").textContent=t.gotItBtn;
+      document.getElementById("fbAgain").onclick=()=>grade(id,"again");
+      document.getElementById("fbNext").onclick=()=>grade(id,"good");
+    }else{
+      fb.className="feedback show no";
+      fb.innerHTML=`${t.wrongFeedbackPrefix}<span class="correct-zin">${w.s}</span><span style="font-size:13px">(${w.e}${nativeParen})</span>`;
+      document.getElementById("fbNext").textContent=t.continueBtn;
+      document.getElementById("fbNext").onclick=()=>grade(id,"again");
+    }
+  };
+  K.querySelector(".b-check").onclick=check;
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();if(document.getElementById("rowCheck").style.display!=="none")check()}});
 }
 function grade(id,g){
   const w=byId[id];
   if(!S.cards[id]){
-    S.cards[id]={r:0,iv:0,ef:2.5,due:0,step:0};
+    S.cards[id]={r:0,due:0,step:0};
     S.newLog.count++;
   }
   const done=schedule(S.cards[id],g,!!w.c);
@@ -778,9 +979,9 @@ function pickTargets(){
   const grads=graduatedIds();
   const sorted=grads.sort((a,b)=>{
     const ca=S.cards[a],cb=S.cards[b];
-    return (ca.ef-cb.ef)||(ca.iv-cb.iv);
+    return ((cb.df||5)-(ca.df||5))||((ca.st||0)-(cb.st||0));
   });
-  // weakest cards first (low ease = most lapses), skip ultra-common function words (id<35 heuristic keeps it meaningful)
+  // weakest cards first (high FSRS difficulty = most lapses), skip ultra-common function words (id<35 heuristic keeps it meaningful)
   targetIds=sorted.filter(id=>id>35).slice(0,7);
   if(targetIds.length<7)targetIds=sorted.slice(0,7);
 }
@@ -816,7 +1017,7 @@ function saveEntry(){
   const text=document.getElementById("schrijfTxt").value.trim();
   if(text.split(/\s+/).length<10)return toast(t.minTenWords);
   const used=targetIds.filter(id=>textUsesWord(text,byId[id].w));
-  used.forEach(id=>{const c=S.cards[id];if(c&&c.iv>=1){schedule(c,"good",!!byId[id].c)}});
+  used.forEach(id=>{const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!byId[id].c)}});
   S.journal.unshift({d:today(),text,words:targetIds.map(id=>byId[id].w),used:used.length});
   S.journal=S.journal.slice(0,60);
   S.lastSchrijf=Date.now();
@@ -866,6 +1067,164 @@ function renderJournal(){
     `<div class="jentry"><div class="jdate">${e.d} · ${e.used}/${e.words.length} ${t.targetWordsLabel}</div>${e.text.replace(/</g,"&lt;")}</div>`).join("");
 }
 
+/* ================= Spreken / Speak (ASR pronunciation practice) ================= */
+const SRClass=window.SpeechRecognition||window.webkitSpeechRecognition||null;
+let speakIds=[],speakPos=0,recActive=null;
+function openSpreek(){
+  const grads=graduatedIds();
+  const t=T();
+  document.getElementById("spreekTitle").textContent=t.spreekTitle;
+  document.getElementById("spreekIntro").textContent=SRClass?t.spreekIntro:t.spreekIntroFallback;
+  if(grads.length<15){
+    document.getElementById("speakCard").innerHTML=`<span class="en-prompt">${t.speakLockMsg}</span>`;
+    show("scr-spreek");return;
+  }
+  // practice soonest-due sentences first (retrieval where it counts)
+  speakIds=grads.sort((a,b)=>(S.cards[a].due||0)-(S.cards[b].due||0)).slice(0,8);
+  speakPos=0;
+  show("scr-spreek");renderSpeakCard();
+}
+function renderSpeakCard(){
+  const t=T();
+  if(speakPos>=speakIds.length){toast(t.speakDoneMsg);show("scr-home");return}
+  const id=speakIds[speakPos],w=byId[id];
+  const box=document.getElementById("speakCard");
+  const counter=`<div class="en-prompt" style="text-align:right">${speakPos+1}/${speakIds.length}</div>`;
+  if(SRClass){
+    box.innerHTML=`${counter}
+      <div class="en-prompt">“${w.x}”</div>
+      <div class="target-zin">${w.s}</div>
+      <div class="btnrow" style="margin-top:8px"><button style="background:#EEF2FA;color:var(--blue)" id="spkPlay">${t.playBtn}</button></div>
+      <button class="micbtn" id="micBtn">${t.micStart}</button>
+      <div class="speak-fb" id="spkFb"></div>
+      <div class="btnrow" style="margin-top:10px;display:none" id="spkNextRow"><button class="b-good" id="spkNext">${t.speakNext}</button></div>`;
+    box.querySelector("#spkPlay").onclick=()=>speak(w.s);
+    box.querySelector("#spkNext").onclick=()=>{speakPos++;renderSpeakCard()};
+    const mic=box.querySelector("#micBtn");
+    mic.onclick=()=>{
+      if(recActive){try{recActive.stop()}catch(e){}recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart;return}
+      const rec=new SRClass();recActive=rec;
+      rec.lang=PROFILE.ttsLang;rec.interimResults=false;rec.maxAlternatives=3;
+      mic.classList.add("rec");mic.textContent=t.micListening;
+      rec.onresult=ev=>{
+        const alts=[...ev.results[0]].map(r=>r.transcript);
+        const sim=Math.max(...alts.map(a=>similarity(a,w.s)));
+        const fb=box.querySelector("#spkFb");
+        fb.classList.add("show");
+        if(sim>=0.72){
+          fb.className="speak-fb show ok";
+          fb.innerHTML=`${t.speakOk}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]}”</span>`;
+          const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!w.c);save()}
+          box.querySelector("#spkNextRow").style.display="flex";
+        }else{
+          fb.className="speak-fb show no";
+          fb.innerHTML=`${t.speakNo}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]||"…"}”</span>`;
+          box.querySelector("#spkNextRow").style.display="flex";
+        }
+      };
+      rec.onend=()=>{recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart};
+      rec.onerror=()=>{recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart};
+      try{rec.start()}catch(e){recActive=null;mic.classList.remove("rec")}
+    };
+  }else{
+    // graceful fallback: self-judged shadowing (still valuable output practice)
+    box.innerHTML=`${counter}
+      <div class="en-prompt">“${w.x}”</div>
+      <div class="target-zin">${w.s}</div>
+      <div class="btnrow" style="margin-top:8px">
+        <button style="background:#EEF2FA;color:var(--blue)" id="spkPlay">${t.playBtn}</button>
+        <button style="background:#EEF2FA;color:var(--blue)" id="spkSlow">${t.playSlowBtn}</button>
+      </div>
+      <div class="btnrow" style="margin-top:12px">
+        <button class="b-again" id="spkSelfNo">${t.speakSelfNo}</button>
+        <button class="b-good" id="spkSelfOk">${t.speakSelfOk}</button>
+      </div>`;
+    box.querySelector("#spkPlay").onclick=()=>speak(w.s);
+    box.querySelector("#spkSlow").onclick=()=>speak(w.s,0.65);
+    box.querySelector("#spkSelfOk").onclick=()=>{const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!w.c);save()}speakPos++;renderSpeakCard()};
+    box.querySelector("#spkSelfNo").onclick=()=>{speakPos++;renderSpeakCard()};
+  }
+  speak(w.s);
+}
+
+/* ================= Fluency Sprint (Nation's 4th strand: known items, speed pressure) ================= */
+const SPRINT_SECS=60,SPRINT_NEED=20;
+let sprTimer=null,sprEnd=0,sprScore=0,sprPool=[];
+function maturePool(){return Object.keys(S.cards).filter(id=>{const c=S.cards[id];return (c.st||0)>=7||(c.r||0)>=3}).map(Number)}
+function openSprint(){
+  const t=T();
+  document.getElementById("sprintTitle").textContent=t.sprintTitle;
+  const pool=maturePool();
+  const area=document.getElementById("sprintArea");
+  if(pool.length<SPRINT_NEED){
+    document.getElementById("sprintIntro").textContent=t.sprintLockTemplate(SPRINT_NEED,pool.length);
+    area.innerHTML="";
+    show("scr-sprint");return;
+  }
+  document.getElementById("sprintIntro").textContent=t.sprintIntro;
+  area.innerHTML=`<div class="btnrow"><button class="b-good" id="sprGo">${t.sprintStart}</button></div>
+    <div class="en-prompt" style="text-align:center;margin-top:10px">${t.bestTemplate(S.sprintBest||0)}</div>`;
+  area.querySelector("#sprGo").onclick=startSprint;
+  show("scr-sprint");
+}
+function stopSprint(){if(sprTimer){clearInterval(sprTimer);sprTimer=null}}
+function startSprint(){
+  sprPool=maturePool();sprScore=0;sprEnd=Date.now()+SPRINT_SECS*1000;
+  stopSprint();
+  sprTimer=setInterval(()=>{
+    const left=sprEnd-Date.now();
+    const bar=document.getElementById("sprBar");
+    if(bar)bar.style.width=Math.max(0,100*left/(SPRINT_SECS*1000))+"%";
+    const tl=document.getElementById("sprLeft");
+    if(tl)tl.textContent=Math.max(0,Math.ceil(left/1000))+" "+T().sprintTimeLabel;
+    if(left<=0)endSprint();
+  },250);
+  sprintQuestion();
+}
+function sprintQuestion(){
+  const t=T();
+  const area=document.getElementById("sprintArea");
+  const id=sprPool[Math.floor(Math.random()*sprPool.length)];
+  const w=byId[id];
+  const toTarget=Math.random()<0.5; // alternate directions: recognize & recall
+  const distract=[];
+  while(distract.length<3){
+    const d=byId[sprPool[Math.floor(Math.random()*sprPool.length)]];
+    if(d.i!==w.i&&!distract.some(x=>x.i===d.i))distract.push(d);
+  }
+  const opts=[w,...distract].sort(()=>Math.random()-0.5);
+  area.innerHTML=`
+    <div class="sprint-score"><span id="sprLeft"></span><span>${t.sprintScoreLabel}: <b id="sprSc">${sprScore}</b></span></div>
+    <div class="sprint-timer"><i id="sprBar"></i></div>
+    <div class="sprint-q">${toTarget?w.e:w.w}</div>
+    <div class="sprint-opts" id="sprOpts">
+      ${opts.map(o=>`<button data-i="${o.i}">${toTarget?o.w:o.e}</button>`).join("")}
+    </div>`;
+  area.querySelectorAll("#sprOpts button").forEach(b=>{
+    b.onclick=()=>{
+      if(!sprTimer)return;
+      if(+b.dataset.i===w.i){
+        sprScore++;b.classList.add("ok");
+        setTimeout(sprintQuestion,120);
+      }else{
+        b.classList.add("no");
+        area.querySelector(`#sprOpts button[data-i="${w.i}"]`).classList.add("ok");
+        setTimeout(sprintQuestion,600);
+      }
+    };
+  });
+}
+function endSprint(){
+  stopSprint();
+  const t=T();
+  const prev=S.sprintBest||0;
+  const area=document.getElementById("sprintArea");
+  area.innerHTML=`<div class="sprint-q">${t.sprintResultTemplate(sprScore,prev)}</div>
+    <div class="btnrow" style="margin-top:14px"><button class="b-good" id="sprAgain">${t.sprintAgain}</button></div>`;
+  if(sprScore>prev){S.sprintBest=sprScore;save()}
+  area.querySelector("#sprAgain").onclick=startSprint;
+}
+
 /* ================= home rendering ================= */
 function renderHome(){
   const t=T();
@@ -904,9 +1263,14 @@ function renderHome(){
   document.getElementById("lezenNote").textContent=open+"/"+STORIES.length+" "+t.storiesLabel;
   const grads=graduatedIds().length;
   document.getElementById("schrijfNote").textContent=S.journal.length?S.journal.length+" "+t.entriesLabel:t.writeOwnSentencesLabel;
+  const gradCount=graduatedIds().length;
+  document.getElementById("spreekNote").textContent=gradCount>=15?t.phrasesReadyTemplate(Math.min(8,gradCount)):"🔒";
+  const mp=maturePool().length;
+  document.getElementById("sprintNote").textContent=mp>=SPRINT_NEED?t.bestTemplate(S.sprintBest||0):"🔒 "+mp+"/"+SPRINT_NEED;
   document.getElementById("schrijfBadge").style.display=(grads>=15&&Date.now()-S.lastSchrijf>6*DAY)?"block":"none";
   document.querySelectorAll("#segNew button").forEach(b=>b.classList.toggle("on",+b.dataset.v===S.settings.newPerDay));
   document.querySelectorAll("#segMode button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.settings.mode));
+  document.querySelectorAll("#segRet button").forEach(b=>b.classList.toggle("on",+b.dataset.v===(S.settings.retention||0.9)));
   document.getElementById("apiKeyIn").value=S.settings.apiKey||"";
 }
 
@@ -919,8 +1283,10 @@ document.getElementById("btnQuit").onclick=()=>{if(reviewedOk>0){S.days[today()]
 document.getElementById("btnHome").onclick=()=>show("scr-home");
 document.getElementById("btnLezen").onclick=()=>show("scr-lezen");
 document.getElementById("btnSchrijf").onclick=()=>show("scr-schrijf");
+document.getElementById("btnSpreek").onclick=()=>openSpreek();
+document.getElementById("btnSprint").onclick=()=>openSprint();
 document.getElementById("btnReaderBack").onclick=()=>{speechSynthesis.cancel();show("scr-lezen")};
-document.querySelectorAll(".backbtn").forEach(b=>b.onclick=()=>show("scr-home"));
+document.querySelectorAll(".backbtn").forEach(b=>b.onclick=()=>{stopSprint();show("scr-home")});
 document.getElementById("rPlay").onclick=()=>speak(curStory.txt,0.92);
 document.getElementById("rPlaySlow").onclick=()=>speak(curStory.txt,0.7);
 document.getElementById("rStop").onclick=()=>speechSynthesis.cancel();
@@ -932,6 +1298,7 @@ document.getElementById("schrijfTxt").addEventListener("input",()=>updateTargets
 document.getElementById("btnSettings").onclick=()=>document.getElementById("settingsPanel").classList.toggle("open");
 document.querySelectorAll("#segNew button").forEach(b=>b.onclick=()=>{S.settings.newPerDay=+b.dataset.v;save();renderHome()});
 document.querySelectorAll("#segMode button").forEach(b=>b.onclick=()=>{S.settings.mode=b.dataset.v;save();renderHome()});
+document.querySelectorAll("#segRet button").forEach(b=>b.onclick=()=>{S.settings.retention=+b.dataset.v;save();renderHome()});
 document.getElementById("apiKeyIn").addEventListener("change",e=>{S.settings.apiKey=e.target.value.trim();save();toast(T().keySaved)});
 document.getElementById("btnReset").onclick=()=>{if(confirm(T().resetConfirmTemplate(PROFILE.tagline))){S=JSON.parse(JSON.stringify(DEFAULT));save();renderHome();toast(T().resetDone)}};
 document.getElementById("btnExport").onclick=()=>{
@@ -955,7 +1322,7 @@ document.getElementById("importFile").onchange=e=>{
         e.target.value="";return;
       }
       delete s._profile;
-      S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);save();renderHome();toast(T().progressImported);
+      S=Object.assign({},JSON.parse(JSON.stringify(DEFAULT)),s);migrateCards(S.cards);save();renderHome();toast(T().progressImported);
     }catch(err){toast(T().invalidFile)}
   };
   r.readAsText(f);e.target.value="";

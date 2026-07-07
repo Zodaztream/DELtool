@@ -408,6 +408,9 @@ const UI_STRINGS={
     speakHeard:"Gehoord:",speakOk:"Goed uitgesproken! ✓",speakNo:"Nog niet helemaal — probeer nog eens.",
     speakSelfOk:"✓ Dat lukte",speakSelfNo:"✗ Nog niet",speakNext:"Volgende zin",speakDoneMsg:"Spreeksessie klaar! 🎉",
     speakLockMsg:"Leer eerst ±15 woorden, dan kun je gaan spreken.",
+    speakNoHear:"Ik hoorde niets — probeer opnieuw, dicht bij de microfoon.",
+    speakMicDenied:"Geen toegang tot de microfoon. Sta microfoongebruik toe in je browserinstellingen.",
+    speakUnavailableToast:"Spraakherkenning werkt hier niet — overgeschakeld naar zelf beoordelen",
     sprintTitle:"Fluency-sprint",sprintIntro:"60 seconden, alleen woorden die je al kent. Hoe snel ben je?",
     sprintStart:"Start sprint",sprintAgain:"Nog een keer",
     sprintScoreLabel:"score",sprintBestLabel:"record",sprintTimeLabel:"sec",
@@ -470,6 +473,9 @@ const UI_STRINGS={
     speakHeard:"Heard:",speakOk:"Well pronounced! ✓",speakNo:"Not quite — try once more.",
     speakSelfOk:"✓ Got it",speakSelfNo:"✗ Not yet",speakNext:"Next sentence",speakDoneMsg:"Speaking session done! 🎉",
     speakLockMsg:"Learn about 15 words first, then you can start speaking.",
+    speakNoHear:"I didn't hear anything — try again, close to the microphone.",
+    speakMicDenied:"No microphone access. Allow microphone use in your browser settings.",
+    speakUnavailableToast:"Speech recognition doesn't work here — switched to self-assessment",
     sprintTitle:"Fluency sprint",sprintIntro:"60 seconds, only words you already know. How fast are you?",
     sprintStart:"Start sprint",sprintAgain:"One more round",
     sprintScoreLabel:"score",sprintBestLabel:"best",sprintTimeLabel:"sec",
@@ -1069,13 +1075,15 @@ function renderJournal(){
 }
 
 /* ================= Spreken / Speak (ASR pronunciation practice) ================= */
-const SRClass=window.SpeechRecognition||window.webkitSpeechRecognition||null;
-let speakIds=[],speakPos=0,recActive=null;
+const SR_IOS_STANDALONE=(navigator.standalone===true||(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches))&&/iPad|iPhone|iPod/.test(navigator.userAgent);
+const SRClass=(!SR_IOS_STANDALONE&&(window.SpeechRecognition||window.webkitSpeechRecognition))||null;
+let speakIds=[],speakPos=0,recActive=null,srBroken=false,srWatchdog=null;
+function srAvailable(){return !!SRClass&&!srBroken}
 function openSpreek(){
   const grads=graduatedIds();
   const t=T();
   document.getElementById("spreekTitle").textContent=t.spreekTitle;
-  document.getElementById("spreekIntro").textContent=SRClass?t.spreekIntro:t.spreekIntroFallback;
+  document.getElementById("spreekIntro").textContent=srAvailable()?t.spreekIntro:t.spreekIntroFallback;
   if(grads.length<15){
     document.getElementById("speakCard").innerHTML=`<span class="en-prompt">${t.speakLockMsg}</span>`;
     show("scr-spreek");return;
@@ -1091,7 +1099,7 @@ function renderSpeakCard(){
   const id=speakIds[speakPos],w=byId[id];
   const box=document.getElementById("speakCard");
   const counter=`<div class="en-prompt" style="text-align:right">${speakPos+1}/${speakIds.length}</div>`;
-  if(SRClass){
+  if(srAvailable()){
     box.innerHTML=`${counter}
       <div class="en-prompt">“${w.x}”</div>
       <div class="target-zin">${w.s}</div>
@@ -1102,30 +1110,48 @@ function renderSpeakCard(){
     box.querySelector("#spkPlay").onclick=()=>speak(w.s);
     box.querySelector("#spkNext").onclick=()=>{speakPos++;renderSpeakCard()};
     const mic=box.querySelector("#micBtn");
+    const resetMic=()=>{if(srWatchdog){clearTimeout(srWatchdog);srWatchdog=null}recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart};
+    const showFb=(cls,html)=>{const fb=box.querySelector("#spkFb");fb.className="speak-fb show "+cls;fb.innerHTML=html;box.querySelector("#spkNextRow").style.display="flex"};
     mic.onclick=()=>{
-      if(recActive){try{recActive.stop()}catch(e){}recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart;return}
+      if(recActive){try{recActive.stop()}catch(e){}resetMic();return}
+      if("speechSynthesis" in window)speechSynthesis.cancel(); // iOS: TTS + capture share one audio session
       const rec=new SRClass();recActive=rec;
       rec.lang=PROFILE.ttsLang;rec.interimResults=false;rec.maxAlternatives=3;
       mic.classList.add("rec");mic.textContent=t.micListening;
+      let gotResult=false;
       rec.onresult=ev=>{
+        gotResult=true;
         const alts=[...ev.results[0]].map(r=>r.transcript);
         const sim=Math.max(...alts.map(a=>similarity(a,w.s)));
-        const fb=box.querySelector("#spkFb");
-        fb.classList.add("show");
         if(sim>=0.72){
-          fb.className="speak-fb show ok";
-          fb.innerHTML=`${t.speakOk}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]}”</span>`;
+          showFb("ok",`${t.speakOk}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]}”</span>`);
           const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!w.c);save()}
-          box.querySelector("#spkNextRow").style.display="flex";
         }else{
-          fb.className="speak-fb show no";
-          fb.innerHTML=`${t.speakNo}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]||"…"}”</span>`;
-          box.querySelector("#spkNextRow").style.display="flex";
+          showFb("no",`${t.speakNo}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]||"…"}”</span>`);
         }
       };
-      rec.onend=()=>{recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart};
-      rec.onerror=()=>{recActive=null;mic.classList.remove("rec");mic.textContent=t.micStart};
-      try{rec.start()}catch(e){recActive=null;mic.classList.remove("rec")}
+      rec.onnomatch=()=>{gotResult=true;showFb("no",t.speakNoHear)};
+      rec.onend=()=>{
+        const wasListening=!!recActive;
+        resetMic();
+        if(wasListening&&!gotResult)showFb("no",t.speakNoHear); // heard nothing: say so instead of silent reset
+      };
+      rec.onerror=ev=>{
+        const err=(ev&&ev.error)||"";
+        resetMic();
+        gotResult=true; // suppress the onend no-hear message; we show a specific one
+        if(err==="not-allowed"){
+          showFb("no",t.speakMicDenied);
+        }else if(err==="service-not-allowed"||err==="audio-capture"||err==="language-not-supported"){
+          srBroken=true; // recognition can't work here (e.g. iOS home-screen app): switch to self-assessment
+          toast(t.speakUnavailableToast);
+          renderSpeakCard();
+        }else{ // no-speech, aborted, network blips: retry hint
+          showFb("no",t.speakNoHear);
+        }
+      };
+      srWatchdog=setTimeout(()=>{try{rec.stop()}catch(e){}},10000); // never hang in "Listening…"
+      try{rec.start()}catch(e){resetMic();srBroken=true;toast(t.speakUnavailableToast);renderSpeakCard()}
     };
   }else{
     // graceful fallback: self-judged shadowing (still valuable output practice)

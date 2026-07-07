@@ -758,12 +758,13 @@ function clozeFor(w){
 function currentModeFor(id){
   const c=S.cards[id];
   const reps=c?c.r||0:0;
-  if(!c||reps<2)return "flash";
+  if(!c||reps<1)return "flash"; // learning-phase cards are always flashcards
   const m=S.settings.mode;
   if(m==="flash"||m==="type"||m==="listen")return m;
   if(m==="cloze")return clozeFor(byId[id])?"cloze":"type";
-  // auto: deterministic interleave across the four types (research: interleaving > blocking)
-  const pool=["type","flash","listen","cloze"];
+  // auto: deterministic interleave (research: interleaving > blocking).
+  // Progressive on-ramp: first review mixes production+recognition; dictation/cloze join from the 2nd review.
+  const pool=reps<2?["type","flash"]:["type","flash","listen","cloze"];
   let pick=pool[(id+reps)%pool.length];
   if(pick==="cloze"&&!clozeFor(byId[id]))pick="type";
   return pick;

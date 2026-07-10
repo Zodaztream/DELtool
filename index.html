@@ -650,18 +650,29 @@ function migrateCards(cards){
   }
   return cards;
 }
+// FSRS-6 same-day (short-term) stability update: history within a session counts.
+function fsrsShortTermS(st,g){
+  let inc=Math.exp(FSRS_W[17]*(g-3+FSRS_W[18]))*Math.pow(st,-FSRS_W[19]);
+  if(g>=3)inc=Math.max(inc,1);
+  return clampNum(st*inc,0.001,36500);
+}
 function schedule(c,grade,isCognate){
   const g=grade==="again"?1:grade==="easy"?4:3;
   const now=Date.now();
-  if(c.st==null){ // learning phase (same steps as before: 'good' twice, 'easy' skips)
+  if((c.r||0)===0){ // learning phase: 'good' twice or 'easy' graduates (steps unchanged)
+    if(c.st==null){ // the FIRST grade initializes FSRS memory (real-FSRS behavior) —
+      c.st=FSRS_W[g-1]*(isCognate?1.3:1); // a word that starts hard stays scheduled as hard,
+      c.df=fsrsD0(g);                     // even if the 3rd same-session press feels easy
+    }else{ // same-session repeat: short-term nudge, not a fresh start
+      c.st=fsrsShortTermS(c.st,g);
+      c.df=fsrsNextD(c.df,g);
+    }
     if(g===1){c.step=0;return false}
     if(g===3){
       c.step=(c.step||0)+1;
       if(c.step<2)return false;
     }
-    c.st=FSRS_W[g-1]*(isCognate?1.3:1); // initial stability, cognate boost preserves prior design
-    c.df=fsrsD0(g);
-    c.r=(c.r||0)+1;c.lr=now;c.due=now+fsrsInterval(c.st)*DAY;
+    c.r=1;c.lr=now;c.due=now+fsrsInterval(c.st)*DAY;
     return true;
   }
   // review phase
@@ -1024,7 +1035,7 @@ function saveEntry(){
   const text=document.getElementById("schrijfTxt").value.trim();
   if(text.split(/\s+/).length<10)return toast(t.minTenWords);
   const used=targetIds.filter(id=>textUsesWord(text,byId[id].w));
-  used.forEach(id=>{const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!byId[id].c)}});
+  used.forEach(id=>{const c=S.cards[id];if(c&&(c.r||0)>=1){schedule(c,"good",!!byId[id].c)}});
   S.journal.unshift({d:today(),text,words:targetIds.map(id=>byId[id].w),used:used.length});
   S.journal=S.journal.slice(0,60);
   S.lastSchrijf=Date.now();
@@ -1125,7 +1136,7 @@ function renderSpeakCard(){
         const sim=Math.max(...alts.map(a=>similarity(a,w.s)));
         if(sim>=0.72){
           showFb("ok",`${t.speakOk}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]}”</span>`);
-          const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!w.c);save()}
+          const c=S.cards[id];if(c&&(c.r||0)>=1){schedule(c,"good",!!w.c);save()}
         }else{
           showFb("no",`${t.speakNo}<br><span style="font-size:13px">${t.speakHeard} “${alts[0]||"…"}”</span>`);
         }
@@ -1168,7 +1179,7 @@ function renderSpeakCard(){
       </div>`;
     box.querySelector("#spkPlay").onclick=()=>speak(w.s);
     box.querySelector("#spkSlow").onclick=()=>speak(w.s,0.65);
-    box.querySelector("#spkSelfOk").onclick=()=>{const c=S.cards[id];if(c&&c.st>=1){schedule(c,"good",!!w.c);save()}speakPos++;renderSpeakCard()};
+    box.querySelector("#spkSelfOk").onclick=()=>{const c=S.cards[id];if(c&&(c.r||0)>=1){schedule(c,"good",!!w.c);save()}speakPos++;renderSpeakCard()};
     box.querySelector("#spkSelfNo").onclick=()=>{speakPos++;renderSpeakCard()};
   }
   speak(w.s);

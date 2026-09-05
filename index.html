@@ -100,6 +100,19 @@ main{padding:20px 20px 40px}
 .keyinput{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
 .sethint{font-size:11px;color:var(--muted);width:100%;line-height:1.4}
 
+/* placement evaluation */
+.ev-q{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 18px;text-align:center}
+.ev-q h3{font-family:var(--disp);font-size:32px;font-weight:800;color:var(--blue);line-height:1.15;overflow-wrap:break-word}
+.ev-opts{display:grid;grid-template-columns:1fr;gap:9px;margin-top:14px}
+.ev-opts button{background:#fff;border:2px solid #E6ECF6;border-radius:12px;padding:14px 13px;font-size:16px;font-weight:600;color:var(--ink);text-align:left;line-height:1.3}
+.ev-opts button:active{transform:translateY(1px);border-color:var(--blue)}
+.ev-dk{width:100%;margin-top:12px;background:#EEF2FA;color:var(--blue);border-radius:12px;padding:14px;font-size:15px;font-weight:700}
+.ev-res{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.ev-big{font-family:var(--disp);font-size:46px;font-weight:800;color:var(--blue);text-align:center;line-height:1}
+.ev-sub{text-align:center;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+.ev-note{font-size:13.5px;color:var(--ink);line-height:1.5;margin-top:16px}
+.ev-warn{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:10px}
+
 .sess-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .sess-top button{background:transparent;font-size:14px;color:var(--muted)}
 .prog{flex:1;height:8px;background:#E3E6EE;border-radius:4px;overflow:hidden}
@@ -248,6 +261,11 @@ main{padding:20px 20px 40px}
         <span class="sethint" id="apiKeyHint"></span>
       </div>
       <div class="setrow">
+        <label id="lblEval"></label>
+        <div class="seg"><button id="btnEval"></button></div>
+        <span class="sethint" id="evalHint"></span>
+      </div>
+      <div class="setrow">
         <label id="lblResetAll"></label>
         <div class="seg"><button id="btnReset" style="color:var(--err)"></button></div>
       </div>
@@ -325,6 +343,15 @@ main{padding:20px 20px 40px}
       <h2 id="spreekTitle"></h2>
       <p class="intro" id="spreekIntro"></p>
       <div class="speak-card" id="speakCard"></div>
+    </div>
+  </section>
+
+  <!-- PLACEMENT EVALUATION -->
+  <section class="screen" id="scr-eval">
+    <div class="backrow"><button class="backbtn"></button></div>
+    <div class="schrijf">
+      <h2 id="evalTitle"></h2>
+      <div id="evalBody"></div>
     </div>
   </section>
 
@@ -417,6 +444,23 @@ const UI_STRINGS={
     sprintLockTemplate:(need,have)=>"Ontgrendel met "+need+" goed gekende woorden ("+have+"/"+need+")",
     sprintResultTemplate:(sc,best)=>"Score: "+sc+(sc>best?" — nieuw record! 🏆":" · record: "+best),
     phrasesReadyTemplate:(n)=>n+" zinnen klaar",bestTemplate:(n)=>"record: "+n,
+    evalLabel:"Waar sta ik?",evalBtn:"Toets doen",evalTitle:"Waar sta ik?",
+    evalHintNew:"Ken je al wat van deze taal? Doe de plaatsingstoets en begin op de juiste plek.",
+    evalHintPrev:(d,r)=>"Laatste toets: "+d+" \u2192 woord "+r+". Opnieuw doen kan altijd.",
+    evalIntro:"Deze korte toets (16 tot 30 woorden, \u00b1 3 minuten) schat in hoe ver je al bent en zet je op de juiste plek. Kies de betekenis, of zeg eerlijk dat je het woord niet kent \u2014 gokken maakt de uitslag alleen slechter.",
+    evalStart:"Start de toets",evalDontKnow:"Ik ken dit woord niet",
+    evalProgress:(a,b)=>"Woord "+a+" (max. "+b+")",
+    evalResultTitle:"Je startpunt",evalOfWords:(n)=>"van de "+n+" woorden",
+    evalNote:"Deze woorden krijgen het label 'waarschijnlijk bekend' \u2014 niet 'afgerond'. Ze komen allemaal nog een keer langs ter controle, de minst zekere het eerst. Wat je toch niet blijkt te kennen, zakt vanzelf terug in de leerstapel.",
+    evalMissedNote:(n)=>n+" woord(en) die je in de toets miste worden overgeslagen \u2014 die krijg je als eerste te leren.",
+    evalPacingLabel:"Tempo van de controle-herhalingen",
+    evalPaceGentle:"Rustig",evalPaceStandard:"Normaal",evalPaceBrisk:"Vlot",
+    evalLoadTemplate:(perDay,days)=>"\u00b1 "+perDay+" extra herhalingen per dag, "+days+" dagen lang.",
+    evalApply:"Zet me hier neer",evalCancel:"Toch niet",
+    evalApplied:(n)=>n+" woorden toegevoegd \u2713",
+    evalNothing:"Je bent al verder dan de toets aangeeft \u2014 er is niets veranderd.",
+    evalZero:"De toets zet je aan het begin. Begin gewoon bij woord 1 \u2014 er is niets veranderd.",
+    evalRetakeNote:"Je kunt deze toets altijd opnieuw doen. Hij voegt alleen woorden toe, hij haalt nooit voortgang weg.",
   },
   en:{
     lezenLabel:"Read",schrijfLabel:"Write",schrijfBadgeText:"time!",
@@ -482,6 +526,23 @@ const UI_STRINGS={
     sprintLockTemplate:(need,have)=>"Unlocks with "+need+" well-known words ("+have+"/"+need+")",
     sprintResultTemplate:(sc,best)=>"Score: "+sc+(sc>best?" — new best! 🏆":" · best: "+best),
     phrasesReadyTemplate:(n)=>n+" sentences ready",bestTemplate:(n)=>"best: "+n,
+    evalLabel:"Where am I?",evalBtn:"Take test",evalTitle:"Where am I?",
+    evalHintNew:"Already know some of this language? Take the placement test and start in the right place.",
+    evalHintPrev:(d,r)=>"Last test: "+d+" \u2192 word "+r+". You can retake it any time.",
+    evalIntro:"This short test (16 to 30 words, about 3 minutes) estimates how far along you already are and places you there. Pick the meaning, or say honestly that you don't know the word \u2014 guessing only makes the result worse.",
+    evalStart:"Start the test",evalDontKnow:"I don't know this word",
+    evalProgress:(a,b)=>"Word "+a+" (max "+b+")",
+    evalResultTitle:"Your starting point",evalOfWords:(n)=>"of "+n+" words",
+    evalNote:"These words are marked 'probably known' \u2014 not 'finished'. Every one of them comes back for a check, the least certain ones first. Anything you turn out not to know slides back into the learning pile on its own.",
+    evalMissedNote:(n)=>n+" word(s) you missed during the test are skipped \u2014 you'll be taught those first.",
+    evalPacingLabel:"Pace of the check-up reviews",
+    evalPaceGentle:"Gentle",evalPaceStandard:"Standard",evalPaceBrisk:"Brisk",
+    evalLoadTemplate:(perDay,days)=>"\u2248 "+perDay+" extra reviews per day, for "+days+" days.",
+    evalApply:"Place me here",evalCancel:"Not now",
+    evalApplied:(n)=>n+" words added \u2713",
+    evalNothing:"You're already further along than the test suggests \u2014 nothing changed.",
+    evalZero:"The test places you right at the beginning. Just start at word 1 \u2014 nothing changed.",
+    evalRetakeNote:"You can retake this test any time. It only ever adds words; it never removes progress.",
   }
 };
 function T(){return UI_STRINGS[PROFILE.uiLocale]}
@@ -527,7 +588,7 @@ const PROFILE_ORDER=["nl","sv","es","fr"];
 var activeId=localStorage.getItem("duizend_active_profile")||"nl";
 if(!PROFILES[activeId])activeId="nl";
 var PROFILE,WORDS,STORIES,byId,S;
-const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:"",retention:0.9},newLog:{date:"",count:0},journal:[],lastSchrijf:0,sprintBest:0};
+const DEFAULT={cards:{},days:{},settings:{newPerDay:15,mode:"auto",apiKey:"",retention:0.9},newLog:{date:"",count:0},journal:[],lastSchrijf:0,sprintBest:0,eval:null};
 function loadState(key){try{const raw=localStorage.getItem(key);if(raw){const s=JSON.parse(raw);const m=Object.assign({},DEFAULT,s,{settings:Object.assign({},DEFAULT.settings,s.settings||{})});if(![5,8,15,20].includes(m.settings.newPerDay))m.settings.newPerDay=m.settings.newPerDay>8?15:8;if(![0.85,0.9,0.95].includes(m.settings.retention))m.settings.retention=0.9;migrateCards(m.cards);return m}}catch(e){}return JSON.parse(JSON.stringify(DEFAULT))}
 function save(){try{localStorage.setItem(PROFILE.storageKey,JSON.stringify(S))}catch(e){toast(T().savingFailed)}}
 function renderTabs(){
@@ -560,6 +621,8 @@ function applyUiStrings(){
   document.getElementById("sprintLabel").textContent=t.sprintLabel;
   document.getElementById("lblApiKey").textContent=t.apiKeyLabel;
   document.getElementById("apiKeyHint").textContent=t.apiKeyHint;
+  document.getElementById("lblEval").textContent=t.evalLabel;
+  document.getElementById("btnEval").textContent=t.evalBtn;
   document.getElementById("lblResetAll").textContent=t.resetLabel;
   document.getElementById("btnReset").textContent=t.resetBtn;
   document.getElementById("btnQuit").textContent=t.quitBtn;
@@ -1310,6 +1373,272 @@ function renderHome(){
   document.querySelectorAll("#segMode button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.settings.mode));
   document.querySelectorAll("#segRet button").forEach(b=>b.classList.toggle("on",+b.dataset.v===(S.settings.retention||0.9)));
   document.getElementById("apiKeyIn").value=S.settings.apiKey||"";
+  document.getElementById("evalHint").textContent=S.eval?t.evalHintPrev(S.eval.date,S.eval.R):t.evalHintNew;
+}
+
+
+/* ================= placement evaluation — "Waar sta ik? / Where am I?" =================
+   Measures L2 -> L1 recognition of the headword: exactly the skill that the app's
+   learning-phase flashcard grades (currentModeFor() returns "flash" while reps<1),
+   so the test and the app are asking the same question.
+
+   Model: P(know | rank r) = 1 / (1 + exp((r - theta) / slope)), Bayesian grid posterior
+   over (theta, slope). Four-choice items plus an explicit "I don't know" button; the
+   likelihood corrects for the residual guessing that remains (EV_DK).
+
+   Placement is deliberately one-sided. Being placed too low costs a few minutes of
+   re-seeing known words; being placed too high silently skips words you don't know.
+   So we place at the EV_Q (15th) percentile of the posterior for the rank where
+   modelled P(know) = EV_TARGET (85%) — two independent layers of conservatism.
+
+   Cards written are byte-shape-identical to organically graduated ones: r=1, step=2,
+   df=fsrsD0(3) (the "good, good" graduation path), and st computed by INVERTING
+   fsrsInterval() for the assigned day, so fsrsInterval(st) round-trips exactly and
+   retrievability at the due date equals the user's own target retention. */
+const EV_MIN=16;                  // never stop before this many items
+const EV_MAX=30;                  // never ask more than this many
+const EV_SDSTOP=60;               // stop once the posterior SD of the placement rank is this tight
+const EV_DK=0.85;                 // P(presses "don't know" | doesn't know the word)
+const EV_TARGET=0.85;             // place at the rank where modelled P(know)=85%
+const EV_Q=0.20;                  // conservative posterior quantile for that rank
+const EV_SLOPES=[45,70,110,160,220];
+const EV_LOGIT=Math.log(EV_TARGET/(1-EV_TARGET));
+// Grid prior: theta uniform, slope log-normal around 110. Without the slope prior a
+// 22-item test leaves very flat slopes alive in the posterior, which drags the
+// conservative quantile down and under-places by 150+ words for no good reason.
+const EV_GRID=(()=>{
+  const g=[];
+  for(let t=10;t<=1600;t+=10)for(const s of EV_SLOPES)
+    g.push({t:t,s:s,w:Math.exp(-Math.pow(Math.log(s/110),2)/(2*0.42*0.42))});
+  const z=g.reduce((a,b)=>a+b.w,0);
+  g.forEach(x=>x.w/=z);
+  return g;
+})();
+const EV_MAXHORIZON=60;           // never stretch the check-up schedule past this many days
+let ev=null;
+
+function evPKnow(r,t,s){return 1/(1+Math.exp((r-t)/s))}
+function evPCorrect(r,t,s){const p=evPKnow(r,t,s);return p+(1-p)*(1-EV_DK)*0.25}
+function evRankOf(g){return Math.max(0,g.t-g.s*EV_LOGIT)}
+// Inverse of fsrsInterval(): the stability whose scheduled interval is exactly `d` days.
+function evStabilityForDays(d,ret){return d*FSRS_FACTOR/(Math.pow(ret,1/FSRS_DECAY)-1)}
+
+function evStart(){
+  ev={post:EV_GRID.map(g=>g.w),asked:[],used:new Set(),missed:new Set(),cur:null,R:0,theta:0,slope:0,sd:1e9};
+  evRenderQuestion();
+  show("scr-eval");
+}
+// Posterior summaries: mean theta, and mean/SD of the placement rank itself.
+function evStats(){
+  let eT=0,eS=0,eR=0;
+  for(let i=0;i<EV_GRID.length;i++){
+    const g=EV_GRID[i],w=ev.post[i];
+    eT+=w*g.t;eS+=w*g.s;eR+=w*Math.max(0,g.t-g.s*EV_LOGIT);
+  }
+  let vR=0;
+  for(let i=0;i<EV_GRID.length;i++){
+    const g=EV_GRID[i];
+    vR+=ev.post[i]*Math.pow(Math.max(0,g.t-g.s*EV_LOGIT)-eR,2);
+  }
+  return {t:eT,s:eS,R:eR,sd:Math.sqrt(vR)};
+}
+// Three fixed spread probes, then alternate between the frontier estimate (theta) and
+// the placement-rank estimate. Probing both pins down location AND steepness; probing
+// only theta leaves the slope vague, which is what actually limits precision here.
+function evPickIndex(){
+  const N=WORDS.length,k=ev.asked.length;
+  let target;
+  if(k<3){target=Math.round(N*[0.12,0.35,0.70][k])}
+  else{
+    const st=evStats();
+    target=Math.round((k%2?st.R:st.t)+(Math.random()-0.5)*40);
+  }
+  return evNearestUnused(clampNum(target,1,N));
+}
+// Pick the nearest unused word, keeping the cognate mix representative of the local
+// band so an accidental all-cognate draw can't inflate (or a no-cognate draw deflate)
+// the estimate.
+function evNearestUnused(target){
+  const N=WORDS.length,idx0=target-1;
+  const lo=Math.max(0,idx0-25),hi=Math.min(N-1,idx0+25);
+  let cog=0,tot=0;
+  for(let i=lo;i<=hi;i++){tot++;if(WORDS[i].c)cog++}
+  const want=(tot&&Math.random()<cog/tot)?1:0;
+  let best=-1,bestD=1e9,any=-1,anyD=1e9;
+  for(let i=0;i<N;i++){
+    if(ev.used.has(i))continue;
+    const d=Math.abs(i-idx0);
+    if(d<anyD){anyD=d;any=i}
+    if(((WORDS[i].c?1:0)===want)&&d<bestD){bestD=d;best=i}
+  }
+  return(best>=0&&bestD<=30)?best:any;
+}
+// Three distractor glosses from nearby ranks, rejecting any that is the same as — or
+// a near-string-duplicate of — the correct gloss (the datasets contain a handful of
+// repeated glosses, which would otherwise make an item unanswerable).
+function evOptions(idx){
+  const correct=WORDS[idx].e,cn=norm(correct),N=WORDS.length,pool=[];
+  for(let d=1;d<=160&&pool.length<24;d++){
+    for(const j of [idx-d,idx+d]){
+      if(j<0||j>=N||j===idx)continue;
+      const g=WORDS[j].e;if(!g)continue;
+      const gn=norm(g);
+      if(gn===cn||similarity(g,correct)>0.85)continue;
+      if(pool.some(p=>norm(p)===gn))continue;
+      pool.push(g);
+    }
+  }
+  const picks=[];
+  while(picks.length<3&&pool.length)picks.push(pool.splice(Math.floor(Math.random()*Math.min(pool.length,14)),1)[0]);
+  const opts=[correct].concat(picks);
+  for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const tmp=opts[i];opts[i]=opts[j];opts[j]=tmp}
+  return opts;
+}
+function evRenderQuestion(){
+  const t=T(),idx=evPickIndex();
+  if(idx<0)return evFinish();
+  const w=WORDS[idx],opts=evOptions(idx);
+  ev.cur={idx:idx,correct:w.e};
+  for(let j=Math.max(0,idx-5);j<=Math.min(WORDS.length-1,idx+5);j++)ev.used.add(j);
+  const n=ev.asked.length+1;
+  document.getElementById("evalTitle").textContent=t.evalTitle;
+  document.getElementById("evalBody").innerHTML=
+    '<div class="sess-top"><span style="font-size:13px;color:var(--muted)">'+t.evalProgress(n,EV_MAX)+'</span>'+
+    '<div class="prog"><i style="width:'+Math.round(100*(n-1)/EV_MAX)+'%"></i></div></div>'+
+    '<div class="ev-q"><h3>'+w.w+'</h3></div>'+
+    '<div class="ev-opts" id="evOpts"></div>'+
+    '<button class="ev-dk" id="evDk">'+t.evalDontKnow+'</button>';
+  const box=document.getElementById("evOpts");
+  opts.forEach(o=>{
+    const b=document.createElement("button");
+    b.textContent=o;
+    b.onclick=()=>evAnswer(o===ev.cur.correct);
+    box.appendChild(b);
+  });
+  document.getElementById("evDk").onclick=()=>evAnswer(false);
+}
+function evAnswer(correct){
+  const idx=ev.cur.idx,rank=idx+1;
+  ev.asked.push([rank,correct?1:0]);
+  if(!correct)ev.missed.add(idx);
+  let z=0;
+  for(let i=0;i<EV_GRID.length;i++){
+    const g=EV_GRID[i],pc=evPCorrect(rank,g.t,g.s);
+    ev.post[i]*=correct?pc:(1-pc);
+    z+=ev.post[i];
+  }
+  if(z>0)for(let i=0;i<ev.post.length;i++)ev.post[i]/=z;
+  ev.sd=evStats().sd;
+  // Stop as soon as the placement rank is pinned down well enough — a clear beginner
+  // or a clear near-finisher is done in 16 items; only ambiguous cases run to 30.
+  const done=ev.asked.length>=EV_MAX||(ev.asked.length>=EV_MIN&&ev.sd<EV_SDSTOP);
+  if(done)evFinish();else evRenderQuestion();
+}
+// Empirical guard on the prefix assumption. The whole placement rests on the learner
+// really knowing most words below R — so check that against what they actually did,
+// not only against the fitted curve. A learner whose knowledge fades gradually rather
+// than stopping sharply is the one the model fits worst, and is exactly the one this
+// catches, because they leave misses scattered below R.
+function evShrinkToEvidence(R){
+  for(let guard=0;guard<200&&R>0;guard++){
+    const below=ev.asked.filter(a=>a[0]<=R);
+    if(below.length<4)break;                       // too little direct evidence to judge
+    if(below.filter(a=>a[1]).length/below.length>=0.75)break;
+    R-=20;
+  }
+  return Math.max(0,R);
+}
+function evFinish(){
+  const rows=EV_GRID.map((g,i)=>({R:evRankOf(g),w:ev.post[i]})).sort((a,b)=>a.R-b.R);
+  let acc=0,Rq=0;
+  for(const o of rows){acc+=o.w;if(acc>=EV_Q){Rq=o.R;break}}
+  const st=evStats();
+  ev.R=clampNum(evShrinkToEvidence(Math.round(Rq)),0,WORDS.length);
+  ev.theta=Math.round(st.t);ev.slope=Math.round(st.s);
+  evRenderResult();
+}
+// The words this placement would actually create cards for: the prefix below R,
+// minus anything already in progress (never overwritten) and minus every word the
+// learner actually missed during the test. Ordered least-confident-first.
+function evPlan(R){
+  const ids=[];
+  for(let k=0;k<R&&k<WORDS.length;k++){
+    if(ev.missed.has(k))continue;
+    const id=WORDS[k].i;
+    if(S.cards[id])continue;
+    ids.push(id);
+  }
+  ids.reverse();
+  return ids;
+}
+function evBudget(pace,count){
+  const base=S.settings.newPerDay||15;
+  const chosen=pace==="gentle"?Math.max(5,Math.round(base*0.6)):pace==="brisk"?base*2:base;
+  return Math.max(chosen,Math.ceil(count/EV_MAXHORIZON)||1);
+}
+function evRenderResult(){
+  const t=T(),ids=evPlan(ev.R);
+  document.getElementById("evalTitle").textContent=t.evalResultTitle;
+  const missedBelow=Array.from(ev.missed).filter(k=>k<ev.R).length;
+  if(!ids.length){
+    document.getElementById("evalBody").innerHTML=
+      '<div class="ev-res"><p class="ev-note">'+(ev.R<10?t.evalZero:t.evalNothing)+'</p></div>'+
+      '<div class="btnrow"><button class="b-good" id="evClose">'+t.homeBtn+'</button></div>';
+    document.getElementById("evClose").onclick=()=>show("scr-home");
+    return;
+  }
+  document.getElementById("evalBody").innerHTML=
+    '<div class="ev-res">'+
+      '<div class="ev-big">'+ev.R+'</div>'+
+      '<div class="ev-sub">'+t.evalOfWords(WORDS.length)+'</div>'+
+      '<p class="ev-note">'+t.evalNote+'</p>'+
+      (missedBelow?'<p class="ev-warn">'+t.evalMissedNote(missedBelow)+'</p>':'')+
+      '<div class="setrow" style="margin-top:14px"><label>'+t.evalPacingLabel+'</label>'+
+        '<div class="seg" id="evPace">'+
+          '<button data-v="gentle">'+t.evalPaceGentle+'</button>'+
+          '<button data-v="standard" class="on">'+t.evalPaceStandard+'</button>'+
+          '<button data-v="brisk">'+t.evalPaceBrisk+'</button>'+
+        '</div></div>'+
+      '<p class="ev-warn" id="evLoad"></p>'+
+      '<p class="ev-warn">'+t.evalRetakeNote+'</p>'+
+    '</div>'+
+    '<div class="btnrow">'+
+      '<button class="b-again" id="evCancel">'+t.evalCancel+'</button>'+
+      '<button class="b-easy" id="evApply">'+t.evalApply+'</button>'+
+    '</div>';
+  let pace="standard";
+  const load=document.getElementById("evLoad");
+  const paint=()=>{const b=evBudget(pace,ids.length);load.textContent=t.evalLoadTemplate(b,Math.ceil(ids.length/b))};
+  document.querySelectorAll("#evPace button").forEach(b=>b.onclick=()=>{
+    pace=b.dataset.v;
+    document.querySelectorAll("#evPace button").forEach(x=>x.classList.toggle("on",x===b));
+    paint();
+  });
+  paint();
+  document.getElementById("evCancel").onclick=()=>show("scr-home");
+  document.getElementById("evApply").onclick=()=>evApply(ids,evBudget(pace,ids.length));
+}
+function evApply(ids,budget){
+  if(!ev)return;                      // guard against a double tap on "Place me here"
+  const audit={v:1,date:today(),R:ev.R,theta:ev.theta,slope:ev.slope,
+               placed:ids.length,budget:Math.max(1,budget),ret:S.settings.retention||0.9,items:ev.asked};
+  ev=null;
+  const ret=audit.ret,now=Date.now(),b=audit.budget;
+  // Exactly the difficulty an organically graduated card carries after "good, good":
+  // fsrsD0(3) on the first press, then one fsrsNextD nudge on the second.
+  const df=fsrsNextD(fsrsD0(3),3);
+  ids.forEach((id,i)=>{
+    const day=Math.ceil((i+1)/b);
+    const st=clampNum(evStabilityForDays(day,ret),0.05,365);
+    // Identical in shape to a card graduated by "good, good": nothing here is a
+    // state the scheduler could not have produced itself.
+    S.cards[id]={st:st,df:df,r:1,step:2,lr:now,due:now+day*DAY};
+  });
+  S.eval=audit;
+  save();
+  const n=ids.length;
+  show("scr-home");
+  toast(T().evalApplied(n));
 }
 
 /* ================= navigation & misc ================= */
@@ -1334,6 +1663,16 @@ document.getElementById("btnCopyPrompt").onclick=copyPrompt;
 document.getElementById("btnNewTargets").onclick=()=>{targetIds=[];pickTargets();updateTargets();toast(T().newWordsChosen)};
 document.getElementById("schrijfTxt").addEventListener("input",()=>updateTargets());
 document.getElementById("btnSettings").onclick=()=>document.getElementById("settingsPanel").classList.toggle("open");
+document.getElementById("btnEval").onclick=()=>{
+  const t=T();
+  document.getElementById("evalTitle").textContent=t.evalTitle;
+  document.getElementById("evalBody").innerHTML=
+    '<div class="ev-res"><p class="ev-note">'+t.evalIntro+'</p>'+
+    '<p class="ev-warn">'+t.evalRetakeNote+'</p></div>'+
+    '<div class="btnrow"><button class="b-easy" id="evGo">'+t.evalStart+'</button></div>';
+  document.getElementById("evGo").onclick=evStart;
+  show("scr-eval");
+};
 document.querySelectorAll("#segNew button").forEach(b=>b.onclick=()=>{S.settings.newPerDay=+b.dataset.v;save();renderHome()});
 document.querySelectorAll("#segMode button").forEach(b=>b.onclick=()=>{S.settings.mode=b.dataset.v;save();renderHome()});
 document.querySelectorAll("#segRet button").forEach(b=>b.onclick=()=>{S.settings.retention=+b.dataset.v;save();renderHome()});
